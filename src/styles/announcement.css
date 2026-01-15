@@ -1,0 +1,231 @@
+/* ================= CONTAINER ================= */
+.announcement-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  padding: 20px;
+}
+
+/* ================= CARD ================= */
+.announcement-card {
+  width: 100%;
+  max-width: 600px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+}
+
+.announcement-heading {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  color: #d97706;
+  font-weight: 700;
+}
+
+/* ================= FORM ================= */
+.announcement-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.announcement-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.announcement-label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #555;
+  font-size: 14px;
+}
+
+.announcement-input,
+.announcement-textarea,
+.announcement-file-input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+.announcement-input:focus,
+.announcement-textarea:focus,
+.announcement-file-input:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.08);
+}
+
+.announcement-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.announcement-file-input {
+  background: #fafafa;
+  cursor: pointer;
+}
+
+/* ================= CHECKBOX GROUP ================= */
+.announcement-checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: #fff4e6;
+  border-radius: 8px;
+  border: 1px solid #ffe8cc;
+}
+
+.announcement-checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.announcement-checkbox-label {
+  flex: 1;
+  margin: 0;
+  color: #555;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ================= BUTTON ================= */
+.announcement-button {
+  background: linear-gradient(90deg, #f97316, #ef4444);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.announcement-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(249, 115, 22, 0.25);
+}
+
+.announcement-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ================= SPINNER ================= */
+.announcement-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #fff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ================= SUCCESS MESSAGE ================= */
+.announcement-success-message {
+  padding: 12px;
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .announcement-card { padding: 25px; }
+  .announcement-heading { font-size: 1.5rem; }
+}
+
+/* ================= HISTORY MODAL ================= */
+.history-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+}
+
+.history-modal {
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 1200;
+}
+
+.history-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.history-list { display:flex; flex-direction:column; gap:12px; }
+.history-item { display:flex; gap:12px; align-items:center; border:1px solid #eee; padding:10px; border-radius:8px; }
+.history-thumb { width:84px; height:60px; object-fit:cover; border-radius:6px; background:#fef3c7 }
+.history-meta { flex:1 }
+.history-title { font-weight:700; color:#111827 }
+.history-date { font-size:12px; color:#6b7280 }
+.history-close { background:#ef4444; color:white; border:none; padding:6px 10px; border-radius:6px; cursor:pointer }
+
+/* History item actions */
+.history-actions { display:flex; gap:8px }
+.history-view, .history-delete { padding:6px 10px; border-radius:6px; border:none; cursor:pointer; font-weight:600 }
+.history-view { background:#f97316; color:#fff }
+.history-delete { background:#ef4444; color:#fff }
+
+/* Detail modal */
+.detail-overlay { 
+  position: fixed; 
+  inset: 0; 
+  background: rgba(0,0,0,0.6); 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  z-index: 1300;
+}
+.detail-modal { 
+  width: 90%; 
+  max-width: 720px; 
+  background: #fff; 
+  border-radius: 12px; 
+  padding: 18px; 
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  position: relative;
+  z-index: 1300;
+}
+.detail-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px }
+.detail-body { display:flex; flex-direction:column; gap:12px }
+.detail-image { width:100%; height:auto; border-radius:8px; object-fit:cover }
+.detail-content { color:#374151; line-height:1.5 }
+.detail-date { font-size:12px; color:#6b7280 }

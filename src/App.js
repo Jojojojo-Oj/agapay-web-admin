@@ -1,23 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import Sidebar from "./components/Sidebar";
+import Dashboard from "./pages/Dashboard";
+import "./styles/dashboard.css";
+import Applicants from "./pages/Applicant";
+import CreatePost from "./pages/News";
+import CreateAnnouncement from "./pages/Announcement";
+import Incidents from "./pages/Incidents";
+import CreateRescuerAccount from "./pages/CreateRescuer";
 
 function App() {
+  const [page, setPage] = useState("dashboard");
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="dashboard-layout">
+      <Sidebar setPage={setPage} />
+
+      <div className="main">
+
+        {page === "dashboard" && <Dashboard />}
+        {page == "applicant" && <Applicants />}
+        {page == "news" && <CreatePost />}
+        {page == "announcement" && < CreateAnnouncement />}
+        {page == "incidents" && < Incidents />}
+        {page == "rescuer" && < CreateRescuerAccount />}
+        
+
+      </div>
     </div>
   );
 }

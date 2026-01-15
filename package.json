@@ -7,9 +7,15 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.13.2",
+    "cors": "^2.8.5",
+    "firebase": "^12.7.0",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-scripts": "5.0.1",
+    "sweetalert2": "^11.26.17",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

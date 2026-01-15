@@ -1,0 +1,262 @@
+/* ================= PAGE ================= */
+.applicant-page {
+  padding: 24px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+.applicant-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+/* ================= CONTROLS ================= */
+.applicant-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.applicant-search-input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.applicant-search-input::placeholder {
+  color: #9ca3af;
+}
+
+.applicant-select {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  font-family: inherit;
+  background-color: white;
+  cursor: pointer;
+}
+
+/* ================= TABLE ================= */
+.applicant-table-wrapper {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.applicant-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.applicant-table th {
+  padding: 14px;
+  background: #f3f4f6;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+}
+
+.applicant-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.applicant-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+/* ================= EMPTY STATE ================= */
+.applicant-empty {
+  padding: 40px;
+  background: #fff;
+  text-align: center;
+  border-radius: 10px;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+/* ================= BUTTONS ================= */
+.btn-preview {
+  background: #2563eb;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-preview:hover {
+  background: #1d4ed8;
+}
+
+.btn-approve {
+  background: #16a34a;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  margin-right: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-approve:hover {
+  background: #15803d;
+}
+
+.btn-reject {
+  background: #dc2626;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-reject:hover {
+  background: #b91c1c;
+}
+
+/* ================= BADGE ================= */
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+.badge-approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-rejected {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+.badge-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* ================= MODAL ================= */
+.applicant-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.applicant-modal {
+  background: #fff;
+  width: 80%;
+  height: 80vh;
+  display: flex;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.applicant-modal-left,
+.applicant-modal-right {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.applicant-modal-left h3,
+.applicant-modal-right h3 {
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: #1f2937;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 12px;
+}
+
+.applicant-modal-left p {
+  margin-bottom: 12px;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.applicant-modal-left b {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+/* ================= IMAGE GRID ================= */
+.applicant-image-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.applicant-image-label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.applicant-preview-image {
+  width: 100%;
+  height: 240px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1024px) {
+  .applicant-modal {
+    width: 90%;
+    height: 85vh;
+  }
+
+  .applicant-image-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .applicant-modal {
+    width: 95%;
+    height: 90vh;
+    flex-direction: column;
+  }
+
+  .applicant-page {
+    padding: 12px;
+  }
+
+  .applicant-controls {
+    flex-direction: column;
+  }
+
+  .applicant-search-input,
+  .applicant-select {
+    width: 100%;
+  }
+}
