@@ -3,7 +3,15 @@
 // Following clean architecture principles
 
 import { db } from "./firebase";
-import { collection, onSnapshot, updateDoc, doc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  updateDoc,
+  doc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import axios from "axios";
 import { sendAdminNotification } from "./notificationUtility";
 
@@ -64,13 +72,17 @@ export const updateIncidentStatus = async (reportId, newStatus) => {
   try {
     const reportRef = doc(db, "sos_reports", reportId);
     await updateDoc(reportRef, { status: newStatus });
+
     // If publishing (making active), notify rescuers via FCM tokens
     if (newStatus === "active") {
       try {
         const tokenSet = new Set();
 
         // Collect tokens from Users where roles == 'rescuer'
-        const q = query(collection(db, "Users"), where("roles", "==", "rescuer"));
+        const q = query(
+          collection(db, "Users"),
+          where("roles", "==", "rescuer")
+        );
         const usersSnap = await getDocs(q);
         usersSnap.forEach((d) => {
           const data = d.data() || {};
@@ -93,20 +105,30 @@ export const updateIncidentStatus = async (reportId, newStatus) => {
         const fcmTokens = Array.from(tokenSet).filter(Boolean);
         if (fcmTokens.length > 0) {
           const notificationPromises = fcmTokens.map((token) =>
-            axios.post("https://us-central1-agapay-capstone.cloudfunctions.net/sendSingleMessage", {
-              title: `🚨 New SOS Report Published`,
-              body: `A new incident has been published. Please check the app.`,
-              token,
-            }).catch((err) => console.error("Failed to send to token:", token, err))
+            axios
+              .post(
+                "https://us-central1-agapay-capstone.cloudfunctions.net/sendSingleMessage",
+                {
+                  title: `🚨 New SOS Report Published`,
+                  body: `A new incident has been published. Please check the app.`,
+                  token,
+                }
+              )
+              .catch((err) =>
+                console.error("Failed to send to token:", token, err)
+              )
           );
 
           await Promise.allSettled(notificationPromises);
-          console.log(`Notifications attempted for ${fcmTokens.length} rescuer token(s)`);
+          console.log(
+            `Notifications attempted for ${fcmTokens.length} rescuer token(s)`
+          );
         }
       } catch (notifyErr) {
         console.error("Failed to notify rescuers:", notifyErr);
       }
     }
+
     return { success: true };
   } catch (error) {
     throw new Error("Failed to update incident status: " + error.message);
@@ -129,6 +151,8 @@ export const getDisasterTypes = (incidents) => {
 
 /**
  * Filter incidents based on search text, disaster type, and status
+ * ✅ UPDATED: search now includes incident.id so you can search by ID
+ *
  * @param {Array} incidents - List of incidents
  * @param {string} search - Search text
  * @param {string} disasterTypeFilter - Disaster type filter
@@ -143,16 +167,21 @@ export const filterIncidents = (
 ) => {
   return incidents.filter((incident) => {
     const searchText = `
+      ${incident.id || ""}
       ${incident.senderName || ""}
       ${incident.disasterType || ""}
       ${incident.details || ""}
       ${incident.location || ""}
-    `.toLowerCase();
+    `
+      .toLowerCase()
+      .trim();
 
-    const matchesSearch = searchText.includes(search.toLowerCase());
+    const matchesSearch = searchText.includes(search.toLowerCase().trim());
+
     const matchesDisasterType =
       disasterTypeFilter === "all" ||
       incident.disasterType === disasterTypeFilter;
+
     const matchesStatus =
       statusFilter === "all" || incident.status === statusFilter;
 

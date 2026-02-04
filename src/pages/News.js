@@ -134,138 +134,239 @@ export default function CreatePost() {
 
   /* ================= UI ================= */
   return (
-    <div className="news-container">
-      <div className="news-card">
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <h2 className="news-heading">📰 Create News Post</h2>
-          <button
-            className="news-button"
-            onClick={fetchHistory}
-            disabled={historyLoading}
-          >
-            {historyLoading ? "Loading..." : "History"}
-          </button>
+    <div className="news-page">
+      {/* HEADER */}
+      <div className="news-header">
+        <div>
+          <h2 className="news-header-title">Publish News</h2>
         </div>
 
-        {showSuccess && (
-          <div className="news-success-message">
-            ✅ News posted and sent to users
+        <button
+          className="news-btn news-btn-outline"
+          onClick={fetchHistory}
+          disabled={historyLoading}
+        >
+          {historyLoading ? "Loading..." : "View History"}
+        </button>
+      </div>
+
+      {/* SUCCESS */}
+      {showSuccess && (
+        <div className="news-alert-success">
+          ✅ News posted successfully and sent to users.
+        </div>
+      )}
+
+      {/* BODY GRID */}
+      <div className="news-grid">
+        {/* FORM CARD */}
+        <div className="news-card">
+          <div className="news-card-titlebar">
+            <h3 className="news-card-title">Create a News Post</h3>
+            <span className="news-chip">Admin</span>
           </div>
-        )}
 
-        <form className="news-form" onSubmit={handleSubmit}>
-          <input
-            className="news-input"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title"
-          />
+          <form className="news-form" onSubmit={handleSubmit}>
+            <div className="news-field">
+              <label className="news-label">Title</label>
+              <input
+                className="news-input"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter a clear headline..."
+              />
+            </div>
 
-          <textarea
-            className="news-textarea"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Content"
-          />
+            <div className="news-field">
+              <label className="news-label">Content</label>
+              <textarea
+                className="news-textarea"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Write the news content here..."
+              />
+            </div>
 
-          <input
-            className="news-file-input"
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImage(e.target.files[0])}
-          />
+            <div className="news-field">
+              <label className="news-label">Upload Image</label>
 
-          <label className="news-checkbox-group">
-            <input
-              type="checkbox"
-              checked={sendNotification}
-              onChange={(e) => setSendNotification(e.target.checked)}
-            />
-            Send push notification (Users only)
-          </label>
+              <div className="news-upload">
+                <input
+                  className="news-file-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImage(e.target.files[0])}
+                />
+                <div className="news-upload-hint">
+                  {image ? `Selected: ${image.name}` : "PNG/JPG supported"}
+                </div>
+              </div>
+            </div>
 
-          <button className="news-button" type="submit" disabled={loading}>
-            {loading ? "Uploading..." : "Post News"}
-          </button>
-        </form>
+            <div className="news-checkbox-card">
+              <div className="news-checkbox-left">
+                <input
+                  type="checkbox"
+                  checked={sendNotification}
+                  onChange={(e) => setSendNotification(e.target.checked)}
+                />
+                <div>
+                  <div className="news-checkbox-title">
+                    Send push notification
+                  </div>
+                  <div className="news-checkbox-subtitle">
+                    Notify Users only (FCM tokens)
+                  </div>
+                </div>
+              </div>
+
+              <span className="news-chip-muted">Optional</span>
+            </div>
+
+            <button
+              className="news-btn news-btn-primary"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Uploading..." : "Post News"}
+            </button>
+          </form>
+        </div>
+
+        {/* PREVIEW CARD — CHIP REMOVED */}
+        <div className="news-card preview-card">
+          <div className="news-card-titlebar">
+            <h3 className="news-card-title">Live Preview</h3>
+          </div>
+
+          <div className="news-preview">
+            <div className="news-preview-image">
+              {image ? (
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt="preview"
+                  className="news-preview-img"
+                />
+              ) : (
+                <div className="news-preview-placeholder">
+                  Upload an image to preview
+                </div>
+              )}
+            </div>
+
+            <div className="news-preview-body">
+              <div className="news-preview-title">
+                {title || "News title will appear here..."}
+              </div>
+              <div className="news-preview-content">
+                {content || "News content preview will appear here..."}
+              </div>
+            </div>
+          </div>
+
+          <div className="news-preview-footer">
+            <span className="news-preview-note">
+              Tip: Keep titles short and informative.
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* ================= HISTORY MODAL ================= */}
       {showHistory && (
-        <div
-          className="news-history-overlay"
-          onClick={() => setShowHistory(false)}
-        >
-          <div
-            className="news-history-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="news-history-header">
-              <strong>News History</strong>
+        <div className="modal-overlay" onClick={() => setShowHistory(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <div className="modal-title">News History</div>
+                <div className="modal-subtitle">Latest 50 published news</div>
+              </div>
+
               <button
-                className="news-history-close"
+                className="news-btn news-btn-danger"
                 onClick={() => setShowHistory(false)}
               >
                 Close
               </button>
             </div>
 
-            {historyItems.map((it) => (
-              <div key={it.id} className="news-history-item">
-                <img
-                  src={it.imagePath}
-                  alt=""
-                  className="news-history-thumb"
-                />
+            <div className="modal-body">
+              {historyItems.length === 0 && (
+                <div className="empty-state">No news found.</div>
+              )}
 
-                <div className="news-history-meta">
-                  <div className="news-history-title">{it.title}</div>
-                  <div className="news-history-date">
-                    {it.date?.toDate?.().toLocaleString()}
+              {historyItems.map((it) => (
+                <div key={it.id} className="history-row">
+                  <img
+                    src={it.imagePath}
+                    alt=""
+                    className="history-thumb"
+                  />
+
+                  <div className="history-meta">
+                    <div className="history-title">{it.title}</div>
+                    <div className="history-date">
+                      {it.date?.toDate?.().toLocaleString()}
+                    </div>
+                  </div>
+
+                  <div className="history-actions">
+                    <button
+                      className="news-btn news-btn-outline"
+                      onClick={() => {
+                        setSelectedItem(it);
+                        setShowDetail(true);
+                      }}
+                    >
+                      View
+                    </button>
+
+                    <button
+                      className="news-btn news-btn-danger"
+                      onClick={() => handleDelete(it.id)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
-
-                <div className="news-history-actions">
-                  <button
-                    className="news-history-view"
-                    onClick={() => {
-                      setSelectedItem(it);
-                      setShowDetail(true);
-                    }}
-                  >
-                    View
-                  </button>
-
-                  <button
-                    className="news-history-delete"
-                    onClick={() => handleDelete(it.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
 
       {/* ================= DETAIL MODAL ================= */}
       {showDetail && selectedItem && (
-        <div
-          className="news-detail-overlay"
-          onClick={() => setShowDetail(false)}
-        >
+        <div className="modal-overlay" onClick={() => setShowDetail(false)}>
           <div
-            className="news-detail-modal"
+            className="modal-card modal-card-lg"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3>{selectedItem.title}</h3>
-            <img
-              src={selectedItem.imagePath}
-              alt=""
-              className="news-detail-image"
-            />
-            <p>{selectedItem.content}</p>
+            <div className="modal-header">
+              <div>
+                <div className="modal-title">News Details</div>
+                <div className="modal-subtitle">
+                  {selectedItem.date?.toDate?.().toLocaleString()}
+                </div>
+              </div>
+
+              <button
+                className="news-btn news-btn-outline"
+                onClick={() => setShowDetail(false)}
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="detail-body">
+              <div className="detail-title">{selectedItem.title}</div>
+              <img
+                src={selectedItem.imagePath}
+                alt=""
+                className="detail-image"
+              />
+              <p className="detail-content">{selectedItem.content}</p>
+            </div>
           </div>
         </div>
       )}

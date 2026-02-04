@@ -133,88 +133,191 @@ export default function CreateAnnouncement() {
 
   /* ================= UI ================= */
   return (
-    <div className="announcement-container">
-      <div className="announcement-card">
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <h2 className="announcement-heading">📢 Create Announcement</h2>
-          <button
-            className="announcement-button"
-            onClick={fetchHistory}
-            disabled={historyLoading}
-          >
-            {historyLoading ? "Loading..." : "History"}
-          </button>
+    <div className="announcement-page">
+      {/* HEADER */}
+      <div className="announcement-header">
+        <div>
+          <h2 className="announcement-header-title">Publish Announcement</h2>
+          <p className="announcement-header-subtitle">
+            
+          </p>
         </div>
 
-        {showSuccess && (
-          <div className="announcement-success-message">
-            ✅ Announcement sent to USERS only
+        <button
+          className="announcement-btn announcement-btn-outline"
+          onClick={fetchHistory}
+          disabled={historyLoading}
+        >
+          {historyLoading ? "Loading..." : "View History"}
+        </button>
+      </div>
+
+      {/* SUCCESS */}
+      {showSuccess && (
+        <div className="announcement-alert-success">
+          ✅ Announcement posted successfully and sent to users.
+        </div>
+      )}
+
+      {/* GRID */}
+      <div className="announcement-grid">
+        {/* FORM CARD */}
+        <div className="announcement-card">
+          <div className="announcement-card-titlebar">
+            <h3 className="announcement-card-title">Create Announcement</h3>
+            <span className="announcement-chip">Admin</span>
           </div>
-        )}
 
-        <form className="announcement-form" onSubmit={handleSubmit}>
-          <input
-            className="announcement-input"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title"
-          />
+          <form className="announcement-form" onSubmit={handleSubmit}>
+            <div className="announcement-field">
+              <label className="announcement-label">Title</label>
+              <input
+                className="announcement-input"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter announcement title..."
+              />
+            </div>
 
-          <textarea
-            className="announcement-textarea"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Content"
-          />
+            <div className="announcement-field">
+              <label className="announcement-label">Content</label>
+              <textarea
+                className="announcement-textarea"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Write the announcement details..."
+              />
+            </div>
 
-          <input
-            className="announcement-file-input"
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImage(e.target.files[0])}
-          />
+            <div className="announcement-field">
+              <label className="announcement-label">Upload Image</label>
 
-          <label className="announcement-checkbox-group">
-            <input
-              type="checkbox"
-              checked={sendNotification}
-              onChange={(e) => setSendNotification(e.target.checked)}
-            />
-            <span className="announcement-checkbox-label">
-              Send push notification (Users only)
+              <div className="announcement-upload">
+                <input
+                  className="announcement-file-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImage(e.target.files[0])}
+                />
+                <div className="announcement-upload-hint">
+                  {image ? `Selected: ${image.name}` : "PNG/JPG supported"}
+                </div>
+              </div>
+            </div>
+
+            <div className="announcement-checkbox-card">
+              <div className="announcement-checkbox-left">
+                <input
+                  type="checkbox"
+                  checked={sendNotification}
+                  onChange={(e) => setSendNotification(e.target.checked)}
+                />
+                <div>
+                  <div className="announcement-checkbox-title">
+                    Send push notification
+                  </div>
+                  <div className="announcement-checkbox-subtitle">
+                    Notify Users only (FCM tokens)
+                  </div>
+                </div>
+              </div>
+
+              <span className="announcement-chip-muted">Optional</span>
+            </div>
+
+            <button
+              className="announcement-btn announcement-btn-primary"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Posting..." : "Post Announcement"}
+            </button>
+          </form>
+        </div>
+
+        {/* PREVIEW CARD */}
+        <div className="announcement-card preview-card">
+          <div className="announcement-card-titlebar">
+            <h3 className="announcement-card-title">Live Preview</h3>
+            <span className="announcement-chip-muted">Preview</span>
+          </div>
+
+          <div className="announcement-preview">
+            <div className="announcement-preview-image">
+              {image ? (
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt="preview"
+                  className="announcement-preview-img"
+                />
+              ) : (
+                <div className="announcement-preview-placeholder">
+                  Upload an image to preview
+                </div>
+              )}
+            </div>
+
+            <div className="announcement-preview-body">
+              <div className="announcement-preview-title">
+                {title || "Announcement title will appear here..."}
+              </div>
+              <div className="announcement-preview-content">
+                {content || "Announcement content preview will appear here..."}
+              </div>
+            </div>
+          </div>
+
+          <div className="announcement-preview-footer">
+            <span className="announcement-preview-note">
+              Tip: Keep your message clear and short.
             </span>
-          </label>
-
-          <button className="announcement-button" type="submit" disabled={loading}>
-            {loading ? "Posting..." : "Post Announcement"}
-          </button>
-        </form>
+          </div>
+        </div>
       </div>
 
       {/* ================= HISTORY MODAL ================= */}
       {showHistory && (
-        <div className="history-overlay" onClick={() => setShowHistory(false)}>
-          <div className="history-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="history-header">
-              <strong>Announcement History</strong>
-              <button className="history-close" onClick={() => setShowHistory(false)}>
+        <div
+          className="modal-overlay"
+          onClick={() => setShowHistory(false)}
+        >
+          <div
+            className="modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <div>
+                <div className="modal-title">Announcement History</div>
+                <div className="modal-subtitle">Latest 50 announcements</div>
+              </div>
+
+              <button
+                className="announcement-btn announcement-btn-danger"
+                onClick={() => setShowHistory(false)}
+              >
                 Close
               </button>
             </div>
 
-            <div className="history-list">
+            <div className="modal-body">
+              {historyItems.length === 0 && (
+                <div className="empty-state">No announcements found.</div>
+              )}
+
               {historyItems.map((it) => (
-                <div key={it.id} className="history-item">
+                <div key={it.id} className="history-row">
                   <img src={it.imagePath} alt="" className="history-thumb" />
+
                   <div className="history-meta">
                     <div className="history-title">{it.title}</div>
                     <div className="history-date">
                       {it.date?.toDate?.().toLocaleString()}
                     </div>
                   </div>
+
                   <div className="history-actions">
                     <button
-                      className="history-view"
+                      className="announcement-btn announcement-btn-outline"
                       onClick={() => {
                         setSelectedItem(it);
                         setShowDetail(true);
@@ -222,8 +325,9 @@ export default function CreateAnnouncement() {
                     >
                       View
                     </button>
+
                     <button
-                      className="history-delete"
+                      className="announcement-btn announcement-btn-danger"
                       onClick={() => handleDelete(it.id)}
                     >
                       Delete
@@ -238,15 +342,32 @@ export default function CreateAnnouncement() {
 
       {/* ================= DETAIL MODAL ================= */}
       {showDetail && selectedItem && (
-        <div className="detail-overlay" onClick={() => setShowDetail(false)}>
-          <div className="detail-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="detail-header">
-              <strong>{selectedItem.title}</strong>
-              <button className="history-close" onClick={() => setShowDetail(false)}>
+        <div
+          className="modal-overlay"
+          onClick={() => setShowDetail(false)}
+        >
+          <div
+            className="modal-card modal-card-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <div>
+                <div className="modal-title">Announcement Details</div>
+                <div className="modal-subtitle">
+                  {selectedItem.date?.toDate?.().toLocaleString()}
+                </div>
+              </div>
+
+              <button
+                className="announcement-btn announcement-btn-outline"
+                onClick={() => setShowDetail(false)}
+              >
                 Close
               </button>
             </div>
+
             <div className="detail-body">
+              <div className="detail-title">{selectedItem.title}</div>
               <img
                 src={selectedItem.imagePath}
                 alt=""

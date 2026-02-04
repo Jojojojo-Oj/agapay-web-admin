@@ -11,6 +11,12 @@ import {
 } from "../services/incidentsService";
 import { getAddressForLocation, parseCoordinates } from "../services/geocode";
 
+// ===== ALARM CONFIGURATION =====
+const ALARM_CONFIG = {
+  soundFile: "/alarm.mp3", // 👈 CHANGE THIS to your custom sound file
+};
+// ===============================
+
 export default function Incidents() {
   const [reports, setReports] = useState([]);
   const [previewReport, setPreviewReport] = useState(null);
@@ -19,8 +25,12 @@ export default function Incidents() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [notificationBanner, setNotificationBanner] = useState(null);
   const [addressMap, setAddressMap] = useState({});
+  const [notifications, setNotifications] = useState([]); // Queue of notifications
 
   const prevReportIds = useRef(new Set());
+  const alarmIntervalRef = useRef(null); // To control alarm playback
+  const alarmTimeoutRef = useRef(null); // To stop alarm after duration
+  const currentAudioRef = useRef(null); // To track and stop current audio
 
   /* ================= REAL-TIME INCIDENT SUBSCRIPTION ================= */
   useEffect(() => {
@@ -30,9 +40,15 @@ export default function Incidents() {
       } else {
         data.forEach((r) => {
           if (!prevReportIds.current.has(r.id)) {
-            showToast(
-              `${r.senderName || "Unknown"} reported a ${r.disasterType}`
-            );
+            // Add to notification queue
+            const newNotif = {
+              id: r.id,
+              senderName: r.senderName || "Unknown",
+              disasterType: r.disasterType,
+              timestamp: new Date(),
+            };
+            setNotifications((prev) => [newNotif, ...prev]);
+            startAlarmOnce();
             prevReportIds.current.add(r.id);
           }
         });
@@ -55,12 +71,13 @@ export default function Incidents() {
     let cancelled = false;
 
     (async () => {
-      // Simple concurrency control
       const concurrency = 3;
       let index = 0;
+
       const next = async () => {
         if (cancelled || index >= missing.length) return;
         const current = missing[index++];
+
         try {
           const addr = await getAddressForLocation(current.location);
           if (!cancelled) {
@@ -72,7 +89,10 @@ export default function Incidents() {
           if (!cancelled && index < missing.length) await next();
         }
       };
-      await Promise.all(Array.from({ length: Math.min(concurrency, missing.length) }, next));
+
+      await Promise.all(
+        Array.from({ length: Math.min(concurrency, missing.length) }, next)
+      );
     })();
 
     return () => {
@@ -81,43 +101,122 @@ export default function Incidents() {
   }, [reports, addressMap]);
 
   /* ================= FILTERS ================= */
-  const disasterTypes = useMemo(
-    () => getDisasterTypes(reports),
-    [reports]
-  );
+  const disasterTypes = useMemo(() => getDisasterTypes(reports), [reports]);
 
   const filteredReports = useMemo(() => {
-    return filterIncidents(
-      reports,
-      search,
-      disasterTypeFilter,
-      statusFilter
-    );
+    // ✅ Existing filtering logic
+    const results = filterIncidents(reports, search, disasterTypeFilter, statusFilter);
+
+    // ✅ UI SORTING ONLY (Pending first)
+    const statusPriority = {
+      pending: 1,
+      active: 2,     // Published
+      rejected: 3,
+    };
+
+    return [...results].sort((a, b) => {
+      const prioA = statusPriority[a.status] ?? 99;
+      const prioB = statusPriority[b.status] ?? 99;
+
+      // 1) Status priority
+      if (prioA !== prioB) return prioA - prioB;
+
+      // 2) Sort by Sender Name (alphabetical)
+      const senderA = (a.senderName || "").toLowerCase().trim();
+      const senderB = (b.senderName || "").toLowerCase().trim();
+
+      if (senderA !== senderB) return senderA.localeCompare(senderB);
+
+      // 3) Sort by ID (alphabetical fallback)
+      const idA = (a.id || "").toLowerCase();
+      const idB = (b.id || "").toLowerCase();
+
+      return idA.localeCompare(idB);
+    });
   }, [reports, search, disasterTypeFilter, statusFilter]);
+
+  /* ================= PLAY CUSTOM ALARM SOUND ================= */
+  const playAlarmSound = () => {
+    try {
+      // Stop previous audio if playing
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current.currentTime = 0;
+      }
+
+      // Try to play custom audio file first
+      const audio = new Audio(ALARM_CONFIG.soundFile);
+      currentAudioRef.current = audio;
+      audio.play().catch(() => {
+        // Fallback to beep sound if custom sound fails
+        playFallbackBeep();
+      });
+    } catch (error) {
+      console.warn("Could not play alarm sound:", error);
+      playFallbackBeep();
+    }
+  };
+
+  const playFallbackBeep = () => {
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = 800;
+      gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (error) {
+      console.warn("Could not play fallback beep:", error);
+    }
+  };
+
+  const startAlarmOnce = () => {
+    playAlarmSound();
+    // Stop alarm after 5 seconds
+    alarmTimeoutRef.current = setTimeout(() => {
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current = null;
+      }
+    }, 5000);
+  };
+
+  const stopAlarm = () => {
+    if (alarmIntervalRef.current) {
+      clearInterval(alarmIntervalRef.current);
+      alarmIntervalRef.current = null;
+    }
+    if (alarmTimeoutRef.current) {
+      clearTimeout(alarmTimeoutRef.current);
+      alarmTimeoutRef.current = null;
+    }
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+    }
+  };
 
   /* ================= UI TOAST ================= */
   const showToast = (message) => {
-    Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon: "info",
-      title: message,
-      text: "New SOS report received.",
-      showConfirmButton: false,
-      timer: 3500,
-      timerProgressBar: true,
-    });
+    startAlarmOnce(); // Play 5-second alarm
+    console.log("New incident:", message);
   };
 
   /* ================= STATUS UPDATE ================= */
   const handleStatusChange = async (reportId, newStatus) => {
+    stopAlarm(); // Stop alarm when taking action
+    
     const actionColor = newStatus === "active" ? "#16a34a" : "#dc2626";
 
     const result = await Swal.fire({
-      title:
-        newStatus === "active"
-          ? "Publish Incident"
-          : "Reject Incident",
+      title: newStatus === "active" ? "Publish Incident" : "Reject Incident",
       text: `Are you sure you want to ${newStatus} this report?`,
       icon: "warning",
       showCancelButton: true,
@@ -133,7 +232,8 @@ export default function Incidents() {
 
       if (newStatus === "active") {
         const incident = reports.find((r) => r.id === reportId);
-        const prettyLocation = addressMap[reportId] || incident?.location || "Unknown";
+        const prettyLocation =
+          addressMap[reportId] || incident?.location || "Unknown";
 
         setNotificationBanner({
           type: "success",
@@ -167,27 +267,42 @@ export default function Incidents() {
   };
 
   return (
-    <div className="incidents-page">
-      <h2 className="incidents-title">Incidents</h2>
+    <div className="inc-page">
+      {/* HEADER */}
+      <div className="inc-header">
+        <div>
+          <h2 className="inc-title">Incidents</h2>
+          <p className="inc-subtitle">
+            Monitor SOS reports, review details, and publish incidents for responders.
+          </p>
+        </div>
+
+        <div className="inc-header-chip">Real-time</div>
+      </div>
 
       {/* ================= NOTIFICATION BANNER ================= */}
       {notificationBanner && (
-        <div className="incidents-notification-banner incidents-banner-success">
-          <div className="incidents-banner-content">
-            <div className="incidents-banner-title">
-              {notificationBanner.title}
-            </div>
-            <div className="incidents-banner-message">
-              {notificationBanner.message}
-            </div>
-            <div className="incidents-banner-details">
-              <p><strong>Sender:</strong> {notificationBanner.details.sender}</p>
-              <p><strong>Type:</strong> {notificationBanner.details.type}</p>
-              <p><strong>Location:</strong> {notificationBanner.details.location}</p>
+        <div className="inc-banner inc-banner-success">
+          <div className="inc-banner-content">
+            <div className="inc-banner-title">{notificationBanner.title}</div>
+            <div className="inc-banner-message">{notificationBanner.message}</div>
+
+            <div className="inc-banner-details">
+              <p>
+                <strong>Sender:</strong> {notificationBanner.details.sender}
+              </p>
+              <p>
+                <strong>Type:</strong> {notificationBanner.details.type}
+              </p>
+              <p>
+                <strong>Location:</strong> {notificationBanner.details.location}
+              </p>
             </div>
           </div>
+
           <button
-            className="incidents-banner-close"
+            type="button"
+            className="inc-banner-close"
             onClick={() => setNotificationBanner(null)}
           >
             ✕
@@ -195,133 +310,229 @@ export default function Incidents() {
         </div>
       )}
 
-      {/* ================= CONTROLS ================= */}
-      <div className="incidents-controls">
-        <input
-          className="incidents-search-input"
-          type="text"
-          placeholder="Search incidents..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        <select
-          className="incidents-select"
-          value={disasterTypeFilter}
-          onChange={(e) => setDisasterTypeFilter(e.target.value)}
-        >
-          <option value="all">All Disaster Types</option>
-          {disasterTypes.map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
-
-        <select
-          className="incidents-select"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="all">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="active">Published</option>
-          <option value="rejected">Rejected</option>
-        </select>
+      {/* ================= NOTIFICATION STACK ================= */}
+      <div className="inc-notification-stack">
+        {notifications.map((notif) => (
+          <div key={notif.id} className="inc-notification-item">
+            <div className="inc-notif-header">
+              <h4 className="inc-notif-title">🚨 New Incident Report</h4>
+              <button
+                className="inc-notif-close"
+                onClick={() =>
+                  setNotifications((prev) => prev.filter((n) => n.id !== notif.id))
+                }
+              >
+                ✕
+              </button>
+            </div>
+            <div className="inc-notif-body">
+              <p><strong>From:</strong> {notif.senderName}</p>
+              <p><strong>Type:</strong> {notif.disasterType}</p>
+              <p className="inc-notif-time">
+                {notif.timestamp.toLocaleTimeString()}
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* ================= TABLE ================= */}
-      {filteredReports.length === 0 ? (
-        <div className="incidents-empty">No incidents found</div>
-      ) : (
-        <div className="incidents-table-wrapper">
-          <table className="incidents-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Sender</th>
-                <th>Type</th>
-                <th>Location</th>
-                <th>Status</th>
-                <th>Preview</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredReports.map((r) => (
-                <tr key={r.id}>
-                  <td>{r.id}</td>
-                  <td>{r.senderName || "—"}</td>
-                  <td>{r.disasterType || "—"}</td>
-                  <td className="location-cell">{addressMap[r.id] || r.location || "—"}</td>
-                  <td>
-                    <span className={`badge badge-${r.status}`}>
-                      {r.status}
-                    </span>
-                  </td>
-
-                  {/* 🔍 PREVIEW COLUMN */}
-                  <td>
-                    <button
-                      className="btn-preview"
-                      onClick={() => setPreviewReport(r)}
-                    >
-                      View
-                    </button>
-                  </td>
-
-                  {/* 🚦 ACTIONS COLUMN */}
-                  <td>
-                    <button
-                      className="btn-publish"
-                      onClick={() => handleStatusChange(r.id, "active")}
-                    >
-                      Publish
-                    </button>
-                    <button
-                      className="btn-reject"
-                      onClick={() => handleStatusChange(r.id, "rejected")}
-                    >
-                      Reject
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* CONTROLS CARD */}
+      <div className="inc-card inc-controls">
+        <div className="inc-control-group">
+          <label className="inc-label">Search</label>
+          <input
+            className="inc-input"
+            type="text"
+            placeholder="Search by sender, type, location..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
-      )}
 
-      {/* ================= PREVIEW MODAL ================= */}
+        <div className="inc-control-group">
+          <label className="inc-label">Disaster Type</label>
+          <select
+            className="inc-select"
+            value={disasterTypeFilter}
+            onChange={(e) => setDisasterTypeFilter(e.target.value)}
+          >
+            <option value="all">All Types</option>
+            {disasterTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="inc-control-group">
+          <label className="inc-label">Status</label>
+          <select
+            className="inc-select"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="active">Published</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+      </div>
+
+      {/* TABLE CARD */}
+      <div className="inc-card">
+        {filteredReports.length === 0 ? (
+          <div className="inc-empty">
+            <div className="inc-empty-title">No incidents found</div>
+            <div className="inc-empty-subtitle">
+              Try searching another keyword or change filters.
+            </div>
+          </div>
+        ) : (
+          <div className="inc-table-wrap">
+            <table className="inc-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Sender</th>
+                  <th>Type</th>
+                  <th className="location-header">Location</th>
+                  <th>Status</th>
+                  <th>Preview</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredReports.map((r) => (
+                  <tr key={r.id}>
+                    <td className="inc-id">{r.id}</td>
+                    <td>{r.senderName || "—"}</td>
+                    <td>{r.disasterType || "—"}</td>
+                    <td className="location-cell">
+                      {addressMap[r.id] || r.location || "—"}
+                    </td>
+
+                    <td>
+                      <span className={`inc-badge inc-badge-${r.status}`}>
+                        {r.status}
+                      </span>
+                    </td>
+
+                    {/* PREVIEW */}
+                    <td>
+                      <button
+                        type="button"
+                        className="inc-btn inc-btn-outline"
+                        onClick={() => setPreviewReport(r)}
+                      >
+                        View
+                      </button>
+                    </td>
+
+                    {/* ACTIONS */}
+                    <td className="inc-actions">
+                      <button
+                        type="button"
+                        className="inc-btn inc-btn-success"
+                        onClick={() => handleStatusChange(r.id, "active")}
+                      >
+                        Publish
+                      </button>
+
+                      <button
+                        type="button"
+                        className="inc-btn inc-btn-danger"
+                        onClick={() => handleStatusChange(r.id, "rejected")}
+                      >
+                        Reject
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* ================= PREVIEW MODAL (UNIQUE CLASSES) ================= */}
       {previewReport && (
-        <div
-          className="incidents-modal-overlay"
-          onClick={() => setPreviewReport(null)}
-        >
+        <div className="inc-modal-overlay" onClick={() => setPreviewReport(null)}>
           <div
-            className="incidents-modal-content"
+            className="inc-modal-card inc-modal-card-lg"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="incidents-modal-left">
-              <h2>Incident Details</h2>
-              <p><strong>Sender:</strong> {previewReport.senderName}</p>
-              <p><strong>Type:</strong> {previewReport.disasterType}</p>
-              <p><strong>Location:</strong> {addressMap[previewReport.id] || previewReport.location}</p>
-              <p><strong>Status:</strong> {previewReport.status}</p>
-              <p><strong>Description:</strong></p>
-              <p>{previewReport.details || "No description provided."}</p>
+            <div className="inc-modal-header">
+              <div>
+                <div className="inc-modal-title">Incident Details</div>
+                <div className="inc-modal-subtitle">
+                  {previewReport.senderName || "Unknown"} •{" "}
+                  {previewReport.disasterType || "Unknown"}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="inc-btn inc-btn-outline"
+                onClick={() => setPreviewReport(null)}
+              >
+                Close
+              </button>
             </div>
 
-            <div className="incidents-modal-right">
-              <h2>Incident Image</h2>
-              {previewReport.imagePath ? (
-                <img
-                  src={previewReport.imagePath}
-                  alt="Incident"
-                />
-              ) : (
-                <p>No image available</p>
-              )}
+            <div className="inc-preview-body">
+              {/* LEFT DETAILS */}
+              <div className="inc-preview-left">
+                <div className="inc-preview-row">
+                  <span className="inc-preview-label">Sender</span>
+                  <span className="inc-preview-value">
+                    {previewReport.senderName || "—"}
+                  </span>
+                </div>
+
+                <div className="inc-preview-row">
+                  <span className="inc-preview-label">Type</span>
+                  <span className="inc-preview-value">
+                    {previewReport.disasterType || "—"}
+                  </span>
+                </div>
+
+                <div className="inc-preview-row">
+                  <span className="inc-preview-label">Location</span>
+                  <span className="inc-preview-value">
+                    {addressMap[previewReport.id] ||
+                      previewReport.location ||
+                      "—"}
+                  </span>
+                </div>
+
+                <div className="inc-preview-row">
+                  <span className="inc-preview-label">Status</span>
+                  <span className={`inc-badge inc-badge-${previewReport.status}`}>
+                    {previewReport.status}
+                  </span>
+                </div>
+
+                <div className="inc-preview-divider" />
+
+                <div className="inc-preview-desc-title">Description</div>
+                <div className="inc-preview-desc">
+                  {previewReport.details || "No description provided."}
+                </div>
+              </div>
+
+              {/* RIGHT IMAGE */}
+              <div className="inc-preview-right">
+                <div className="inc-preview-image-title">Incident Image</div>
+
+                {previewReport.imagePath ? (
+                  <img src={previewReport.imagePath} alt="Incident" />
+                ) : (
+                  <div className="inc-no-image">No image available</div>
+                )}
+              </div>
             </div>
           </div>
         </div>
