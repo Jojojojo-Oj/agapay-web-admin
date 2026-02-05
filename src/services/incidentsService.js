@@ -13,7 +13,6 @@ import {
   where,
 } from "firebase/firestore";
 import axios from "axios";
-import { sendAdminNotification } from "./notificationUtility";
 
 /**
  * Fetch real-time SOS reports from Firestore

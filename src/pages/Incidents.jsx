@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import "../styles/incidents.css";
@@ -32,6 +32,59 @@ export default function Incidents() {
   const alarmTimeoutRef = useRef(null); // To stop alarm after duration
   const currentAudioRef = useRef(null); // To track and stop current audio
 
+  /* ================= PLAY CUSTOM ALARM SOUND ================= */
+  const playFallbackBeep = useCallback(() => {
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = 800;
+      gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (error) {
+      console.warn("Could not play fallback beep:", error);
+    }
+  }, []);
+
+  const playAlarmSound = useCallback(() => {
+    try {
+      // Stop previous audio if playing
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current.currentTime = 0;
+      }
+
+      // Try to play custom audio file first
+      const audio = new Audio(ALARM_CONFIG.soundFile);
+      currentAudioRef.current = audio;
+      audio.play().catch(() => {
+        // Fallback to beep sound if custom sound fails
+        playFallbackBeep();
+      });
+    } catch (error) {
+      console.warn("Could not play alarm sound:", error);
+      playFallbackBeep();
+    }
+  }, [playFallbackBeep]);
+
+  const startAlarmOnce = useCallback(() => {
+    playAlarmSound();
+    // Stop alarm after 5 seconds
+    alarmTimeoutRef.current = setTimeout(() => {
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current = null;
+      }
+    }, 5000);
+  }, [playAlarmSound]);
+
   /* ================= REAL-TIME INCIDENT SUBSCRIPTION ================= */
   useEffect(() => {
     const unsub = subscribeToIncidents((data) => {
@@ -57,7 +110,7 @@ export default function Incidents() {
     });
 
     return () => unsub();
-  }, []);
+  }, [startAlarmOnce]);
 
   // Resolve human-readable addresses for any reports with coordinates
   useEffect(() => {
@@ -135,59 +188,6 @@ export default function Incidents() {
     });
   }, [reports, search, disasterTypeFilter, statusFilter]);
 
-  /* ================= PLAY CUSTOM ALARM SOUND ================= */
-  const playAlarmSound = () => {
-    try {
-      // Stop previous audio if playing
-      if (currentAudioRef.current) {
-        currentAudioRef.current.pause();
-        currentAudioRef.current.currentTime = 0;
-      }
-
-      // Try to play custom audio file first
-      const audio = new Audio(ALARM_CONFIG.soundFile);
-      currentAudioRef.current = audio;
-      audio.play().catch(() => {
-        // Fallback to beep sound if custom sound fails
-        playFallbackBeep();
-      });
-    } catch (error) {
-      console.warn("Could not play alarm sound:", error);
-      playFallbackBeep();
-    }
-  };
-
-  const playFallbackBeep = () => {
-    try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.frequency.value = 800;
-      gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.5);
-    } catch (error) {
-      console.warn("Could not play fallback beep:", error);
-    }
-  };
-
-  const startAlarmOnce = () => {
-    playAlarmSound();
-    // Stop alarm after 5 seconds
-    alarmTimeoutRef.current = setTimeout(() => {
-      if (currentAudioRef.current) {
-        currentAudioRef.current.pause();
-        currentAudioRef.current = null;
-      }
-    }, 5000);
-  };
-
   const stopAlarm = () => {
     if (alarmIntervalRef.current) {
       clearInterval(alarmIntervalRef.current);
@@ -201,12 +201,6 @@ export default function Incidents() {
       currentAudioRef.current.pause();
       currentAudioRef.current = null;
     }
-  };
-
-  /* ================= UI TOAST ================= */
-  const showToast = (message) => {
-    startAlarmOnce(); // Play 5-second alarm
-    console.log("New incident:", message);
   };
 
   /* ================= STATUS UPDATE ================= */

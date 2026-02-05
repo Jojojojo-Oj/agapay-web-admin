@@ -2,10 +2,12 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
+import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAhwB5Fi4pQsERToK_2UrgHQ0ZHSAo0Zqs",
   authDomain: "agapay-capstone.firebaseapp.com",
+  databaseURL: "https://agapay-capstone-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "agapay-capstone",
   storageBucket: "agapay-capstone.firebasestorage.app",
   messagingSenderId: "543856158845",
@@ -18,4 +20,5 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+export const rtdb = getDatabase(app);
   

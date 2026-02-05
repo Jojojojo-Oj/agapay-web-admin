@@ -112,6 +112,7 @@
   position: absolute;
   inset: 0;
 
+  background-image: url("../assets/agapay_logo.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 500px;

@@ -4,7 +4,6 @@
 
 import { db } from "./firebase";
 import { collection, onSnapshot, updateDoc, doc, query, where } from "firebase/firestore";
-import { sendAdminNotification } from "./notificationUtility";
 
 /**
  * Fetch real-time users from Firestore with ascending order
