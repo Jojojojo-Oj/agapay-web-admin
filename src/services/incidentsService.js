@@ -2,16 +2,20 @@
 // This service handles all business logic for incidents/SOS reports
 // Following clean architecture principles
 
-import { db } from "./firebase";
+import { db, storage } from "./firebase";
 import {
+  addDoc,
   collection,
   onSnapshot,
   updateDoc,
   doc,
+  getDoc,
   getDocs,
   query,
+  serverTimestamp,
   where,
 } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import axios from "axios";
 
 /**
@@ -185,5 +189,196 @@ export const filterIncidents = (
       statusFilter === "all" || incident.status === statusFilter;
 
     return matchesSearch && matchesDisasterType && matchesStatus;
+  });
+};
+
+/**
+ * Subscribe to a group chat's messages in real-time
+ * @param {string} chatId - Group chat document ID
+ * @param {Function} callback - Called with sorted and normalized messages
+ * @param {Function} onError - Optional error callback
+ * @returns {Function} Unsubscribe function
+ */
+export const subscribeToIncidentChats = (chatId, callback, onError) => {
+  if (!chatId) {
+    callback([]);
+    return () => {};
+  }
+
+  const messagesRef = collection(db, "group_chats", chatId, "messages");
+
+  return onSnapshot(
+    messagesRef,
+    (snapshot) => {
+      const data = snapshot.docs
+        .map((docSnap) => {
+          const message = docSnap.data() || {};
+          const rawDate = message.sentAt || message.createdAt || null;
+          const createdAt = rawDate?.toDate
+            ? rawDate.toDate()
+            : rawDate
+            ? new Date(rawDate)
+            : null;
+
+          return {
+            id: docSnap.id,
+            text: message.message || message.text || "",
+            senderName: message.senderName || message.sender || "Unknown",
+            senderId: message.senderId || message.userId || "",
+            mediaUrl: message.mediaUrl || "",
+            type: message.type || "text",
+            createdAt,
+          };
+        })
+        .sort((a, b) => {
+          const timeA = a.createdAt ? a.createdAt.getTime() : 0;
+          const timeB = b.createdAt ? b.createdAt.getTime() : 0;
+          return timeA - timeB;
+        });
+
+      callback(data);
+    },
+    (error) => {
+      if (onError) onError(error);
+    }
+  );
+};
+
+/**
+ * Resolve a user's selfie URL from Users collection using sender ID
+ * @param {string} senderId - Sender/user UID
+ * @returns {Promise<string>} Selfie URL or empty string
+ */
+export const getUserSelfieUrl = async (senderId) => {
+  if (!senderId) return "";
+
+  try {
+    const directDoc = await getDoc(doc(db, "Users", senderId));
+    if (directDoc.exists()) {
+      const data = directDoc.data() || {};
+      return data.selfieUrl || "";
+    }
+
+    const byUidQuery = query(
+      collection(db, "Users"),
+      where("uid", "==", senderId)
+    );
+    const byUidSnap = await getDocs(byUidQuery);
+
+    if (!byUidSnap.empty) {
+      const data = byUidSnap.docs[0].data() || {};
+      return data.selfieUrl || "";
+    }
+
+    return "";
+  } catch (error) {
+    return "";
+  }
+};
+
+/**
+ * Resolve a user's display name from Users collection
+ * @param {string} userId - User document ID or uid
+ * @returns {Promise<string>} Display name
+ */
+export const getUserDisplayName = async (userId) => {
+  if (!userId) return "Unknown";
+
+  try {
+    const directDoc = await getDoc(doc(db, "Users", userId));
+    if (directDoc.exists()) {
+      const data = directDoc.data() || {};
+      const fullName = `${data.firstName || ""} ${data.lastName || ""}`.trim();
+      return fullName || data.name || data.displayName || data.email || "Unknown";
+    }
+
+    const byUidQuery = query(collection(db, "Users"), where("uid", "==", userId));
+    const byUidSnap = await getDocs(byUidQuery);
+    if (!byUidSnap.empty) {
+      const data = byUidSnap.docs[0].data() || {};
+      const fullName = `${data.firstName || ""} ${data.lastName || ""}`.trim();
+      return fullName || data.name || data.displayName || data.email || "Unknown";
+    }
+
+    return "Unknown";
+  } catch (_) {
+    return "Unknown";
+  }
+};
+
+/**
+ * Resolve multiple users' display names
+ * @param {string[]} userIds
+ * @returns {Promise<string[]>}
+ */
+export const getUserDisplayNames = async (userIds = []) => {
+  const uniqueIds = Array.from(new Set((userIds || []).filter(Boolean)));
+  if (uniqueIds.length === 0) return [];
+
+  const names = await Promise.all(uniqueIds.map((id) => getUserDisplayName(id)));
+  return names.filter(Boolean);
+};
+
+/**
+ * Send a text message to an incident group chat
+ * @param {Object} params
+ * @param {string} params.chatId
+ * @param {string} params.senderId
+ * @param {string} params.senderName
+ * @param {string} params.text
+ */
+export const sendIncidentTextMessage = async ({
+  chatId,
+  senderId,
+  senderName,
+  text,
+}) => {
+  const messageText = (text || "").trim();
+  if (!chatId || !senderId || !messageText) return;
+
+  const messagesRef = collection(db, "group_chats", chatId, "messages");
+  await addDoc(messagesRef, {
+    message: messageText,
+    senderId,
+    senderName: senderName || "Admin",
+    sentAt: serverTimestamp(),
+    type: "text",
+    mediaUrl: null,
+    audioDurationSec: null,
+  });
+};
+
+/**
+ * Send an image message to an incident group chat
+ * @param {Object} params
+ * @param {string} params.chatId
+ * @param {string} params.senderId
+ * @param {string} params.senderName
+ * @param {File} params.file
+ */
+export const sendIncidentImageMessage = async ({
+  chatId,
+  senderId,
+  senderName,
+  file,
+}) => {
+  if (!chatId || !senderId || !file) return;
+
+  const safeName = (file.name || "image.jpg").replace(/\s+/g, "-");
+  const filePath = `group_chats/${chatId}/images/${Date.now()}-${safeName}`;
+  const fileRef = ref(storage, filePath);
+
+  await uploadBytes(fileRef, file);
+  const mediaUrl = await getDownloadURL(fileRef);
+
+  const messagesRef = collection(db, "group_chats", chatId, "messages");
+  await addDoc(messagesRef, {
+    message: "",
+    senderId,
+    senderName: senderName || "Admin",
+    sentAt: serverTimestamp(),
+    type: "image",
+    mediaUrl,
+    audioDurationSec: null,
   });
 };

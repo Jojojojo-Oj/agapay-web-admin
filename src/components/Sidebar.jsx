@@ -55,6 +55,13 @@ const Sidebar = ({ setPage }) => {
         </li>
 
         <li
+          className={activeItem === "resolvedCases" ? "active" : ""}
+          onClick={() => handleClick("resolvedCases")}
+        >
+          Resolved Cases
+        </li>
+
+        <li
           className={activeItem === "rescuer" ? "active" : ""}
           onClick={() => handleClick("rescuer")}
         >
