@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AGAPAY – Emergency Response App</title>
+
+  <!-- Montserrat Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar">
+  <div class="container nav-inner">
+
+    <!-- ONLY IMAGE IS A LINK -->
+    <div class="logo">
+      <a href="landing.html">
+        <img src="logo.png" alt="AGAPAY">
+      </a>
+      <span>AGAPAY</span>
+    </div>
+
+    <nav class="nav-links">
+      <a href="landing.html#about">About</a>
+      <a href="landing.html#system-flow">How It Works</a>
+      <a href="landing.html#features">System</a>
+      <a href="landing.html#contact" class="btn-primary">Contact</a>
+    </nav>
+    
+  </div>
+
+  <div class="reg-topbar">
+  <div class="container">
+    <a href="landing.html">← Back to Home</a>
+  </div>
+</div>
+
+</header>
+
+
+<!-- HEADER -->
+<section class="reg-header">
+  <div class="container">
+
+    <h1>Rescuer Application</h1>
+    <p>
+      Organization-affiliated rescuers only. Applicants must belong to a recognized
+      LGU / Agency / Organization within Caloocan City South.
+    </p>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="reg-section">
+  <div class="reg-card">
+
+    <div class="reg-title">
+      <h2>Apply as Organization-Affiliated Rescuer</h2>
+      <span>All submissions are reviewed by AGAPAY administrators</span>
+    </div>
+
+    <form class="reg-form">
+
+      <div class="form-block">
+        <h3>Personal Information</h3>
+        <div class="grid-2">
+          <input type="text" placeholder="First Name *">
+          <input type="text" placeholder="Last Name *">
+          <input type="email" placeholder="Email *">
+          <input type="text" placeholder="Phone *">
+          <input type="date">
+          <input type="text" placeholder="Residence Address (Caloocan South) *">
+        </div>
+      </div>
+
+      <div class="form-block">
+        <h3>Government ID</h3>
+        <div class="grid-2">
+          <select><option>ID Type *</option></select>
+          <input type="text" placeholder="ID Number *">
+          <input type="text" placeholder="ID Front URL">
+          <input type="text" placeholder="ID Back URL">
+        </div>
+      </div>
+
+      <div class="form-block">
+        <h3>Organization Details</h3>
+        <div class="grid-2">
+          <select><option>Organization Type *</option></select>
+          <input type="text" placeholder="Organization Name *">
+          <input type="text" placeholder="Department / Unit">
+          <input type="text" placeholder="Designation">
+          <input type="text" placeholder="Employee / Badge No.">
+          <input type="email" placeholder="Official Email">
+          <input type="text" placeholder="Supervisor Name">
+          <input type="text" placeholder="Supervisor Contact">
+          <input type="text" placeholder="Authorization / Accreditation Letter URL *">
+        </div>
+      </div>
+
+      <div class="submit-row">
+        <button type="submit">Submit Application</button>
+        <p>Applications will appear as <strong>Pending</strong> for review.</p>
+      </div>
+
+    </form>
+
+    <!-- SUCCESS MODAL -->
+<div id="successModal" class="modal">
+  <div class="modal-box">
+    <h3>Application Submitted ✅</h3>
+    <p>
+      Your application has been received and is now under review.
+      Our team will contact you through your email once verification is complete.
+    </p>
+    <button onclick="closeModal()">Okay</button>
+  </div>
+</div>
+
+
+  </div>
+
+
+  
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <span>© 2026 AGAPAY</span>
+    <span>Alert and Guidance Application for Protection and Aid to You</span>
+  </div>
+</footer>
+
+
+<script>
+  const form = document.querySelector('.reg-form');
+  const modal = document.getElementById('successModal');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();   // stop actual submission
+    modal.style.display = 'flex';
+    form.reset();         // clear fields
+  });
+
+  function closeModal() {
+    modal.style.display = 'none';
+  }
+</script>
+
+
+</body>
+</html>

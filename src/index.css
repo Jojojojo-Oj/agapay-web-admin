@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f5f5f5;
+}
+
+/* ✅ WATERMARK ALWAYS VISIBLE (TOP OVERLAY) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url("./assets/agapay_logo.png") no-repeat center;
+  background-size: 600px;
+  opacity: 0.07;
+  pointer-events: none;
+  background-position: 60% center;
+
+  /* ✅ THIS MAKES IT ALWAYS ON TOP */
+  z-index: 9999;
+}

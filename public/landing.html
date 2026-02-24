@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AGAPAY – Emergency Response App</title>
+
+  <!-- Montserrat Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- IMPORTANT: absolute path para hindi ma-break sa React -->
+  <link rel="stylesheet" href="/style.css" />
+
+  <!-- FIX: ibalik ang default scrollbar at spacing -->
+  <style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+  }
+
+  /* ===== LOW-OPACITY MINIMAL SCROLLBAR ===== */
+
+  /* Chrome, Edge, Safari */
+  ::-webkit-scrollbar {
+    width: 6px;          /* manipis */
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15); /* very light */
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.15) transparent;
+  }
+</style>
+
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar">
+  <div class="container nav-inner">
+
+     <div class="logo">
+      <a href="login-2.html">
+        <img src="/logo.png" alt="AGAPAY">
+      </a>
+      <span>AGAPAY</span>
+    </div>
+
+    <nav class="nav-links">
+      <a href="#about">About</a>
+      <a href="#features">How It Works</a>
+      <a href="#team">System</a>
+      <a href="#contact" class="btn-primary">Contact</a>
+    </nav>
+
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+
+  <div class="container hero-grid">
+
+    <div class="hero-text">
+      <span class="badge"> Alert & Guidance Application</span>
+
+      <h1>
+        Emergency Response<br>
+        When Every Second<br>
+        <span>Matters</span>
+      </h1>
+
+      <p>
+        AGAPAY is a mobile-based emergency response system designed for
+        disaster-prone communities. It provides SOS alerts, live location
+        mapping, emergency announcements, and SMS-based communication to
+        support faster rescue and medical response.
+      </p>
+
+      <div class="hero-actions">
+        <a href="register.html" class="btn-primary">Register as Volunteer</a>
+        <a href="#features" class="btn-secondary light">How It Works</a>
+      </div>
+    </div>
+
+    <div class="hero-card">
+      <div class="mockup">
+        <video autoplay muted loop playsinline>
+          <source src="/mockup.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="container about-grid">
+
+    <div class="about-left">
+      <h2>Your Partner in Emergency Preparedness</h2>
+      <p>
+        AGAPAY connects residents, responders, and local authorities through
+        real-time data and coordinated communication during disasters and
+        medical emergencies.
+      </p>
+
+      <div class="about-cards">
+        <div class="about-card">
+          <h4>SOS Emergency Reporting</h4>
+          <span>Residents can quickly report emergencies with location and photo evidence.</span>
+        </div>
+
+        <div class="about-card">
+          <h4>Live GPS Tracking</h4>
+          <span>Real-time location visibility</span>
+        </div>
+
+        <div class="about-card">
+          <h4>Medical Assistance</h4>
+          <span>Emergency health coordination</span>
+        </div>
+
+        <div class="about-card">
+          <h4>Responder Coordination</h4>
+          <span>Centralized command dashboard</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="command-panel">
+      <div class="live-panel">
+        <h3>Real-Time Emergency Workflow</h3>
+        <ul>
+          <li>🆘 SOS report submitted by resident</li>
+          <li>🛡️ Admin verifies incident details</li>
+          <li>📍 Case appears on responder dashboard</li>
+          <li>🚑 Responder dispatched with live route</li>
+          <li>✅ Arrival confirmed via GPS</li>
+          <li>📝 Rescue operation in progress</li>
+          <li>📦 Case resolved and logged</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="container">
+
+    <h2 class="features-title">Our Cutting-Edge Safety Features</h2>
+    <p class="features-sub">
+      From real-time location tracking to emergency alerts, AGAPAY keeps
+      communities safe with reliable emergency response tools.
+    </p>
+
+    <div class="features-grid">
+
+      <div class="feature-box">
+        <div class="feature-image">
+          <img src="/imagesflow1.png" alt="">
+        </div>
+        <div class="feature-content">
+          <h3>Location Tracking</h3>
+          <p>Always visible, no matter where you are during emergencies.</p>
+        </div>
+      </div>
+
+      <div class="feature-box">
+        <div class="feature-image">
+          <img src="/imagesflow1.png" alt="">
+        </div>
+        <div class="feature-content">
+          <h3>SOS Alert Dispatch</h3>
+          <p>Instant SOS alerts sent to responders for immediate action.</p>
+        </div>
+      </div>
+
+      <div class="feature-box">
+        <div class="feature-image">
+          <img src="/imagesflow1.png" alt="">
+        </div>
+        <div class="feature-content">
+          <h3>Preparedness & Safety Guides</h3>
+          <p>Clear disaster safety tips.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SYSTEM / TEAM -->
+<section class="team" id="team">
+  <div class="team-overlay"></div>
+
+  <div class="container team-content">
+    <h2>Built for Communities. Designed for Responders.</h2>
+
+    <p>
+      AGAPAY supports coordination between residents, responders,
+      and local disaster offices.
+    </p>
+
+    <a href="#" class="btn-secondary light">View System Overview</a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="contact-container">
+
+    <div class="contact-form">
+      <h2>Stay Connected</h2>
+      <p class="subtext">Need assistance? Reach out anytime.</p>
+
+      <form>
+        <input type="text" placeholder="Full Name" required />
+        <input type="email" placeholder="Email Address" required />
+        <textarea rows="5" placeholder="Message"></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <div class="support-card">
+      <h3>AGAPAY Support Center</h3>
+      <p>📍 Caloocan City South, Philippines</p>
+      <p>📞 24/7 Hotline: 0912-345-6789</p>
+      <p>✉️ support@agapay.ph</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <span>© 2026 AGAPAY</span>
+    <span>Alert and Guidance Application for Protection and Aid to You</span>
+  </div>
+</footer>
+
+</body>
+</html>

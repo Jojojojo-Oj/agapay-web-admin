@@ -1,0 +1,308 @@
+/* =============================
+   ✅ SCOPED RESET (IMPORTANT FIX)
+   - para hindi masira UI ng ibang pages like News/Incidents
+============================= */
+.dashboard-layout * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =============================
+   ✅ MAIN LAYOUT
+============================= */
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+/* =============================
+   ✅ SIDEBAR (CLEAN FINAL VERSION)
+============================= */
+.sidebar {
+  width: 250px;
+  background: #012F53;
+  color: white;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 10px;
+  margin-bottom: 12px;
+}
+
+.sidebar-logo {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.sidebar-title {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+/* MENU LIST */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* MENU ITEMS */
+.sidebar-menu li {
+  padding: 12px 14px;
+  cursor: pointer;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  margin-bottom: 6px;
+}
+
+.sidebar-menu li:hover {
+  background: rgba(158, 216, 255, 0.15);
+}
+
+/* ACTIVE ITEM */
+.sidebar-menu li.active {
+  background: #9ED8FF;
+  color: #012F53;
+  font-weight: 800;
+}
+
+/* LOGOUT BUTTON STYLE */
+.sidebar-logout {
+  margin-top: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  text-align: center;
+  font-weight: 800;
+}
+
+.sidebar-logout:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* =============================
+   ✅ MAIN RIGHT SIDE
+============================= */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f4f9fc;
+  overflow: hidden;
+
+  /* ✅ Needed for background watermark overlay */
+  position: relative;
+}
+
+/* ✅ GLOBAL BACKGROUND DESIGN IMAGE (ALL PAGES) */
+.main::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image: url("../assets/agapay_logo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 500px;
+
+  opacity: 0.06; /* ✅ low opacity watermark */
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ✅ Make content appear above watermark */
+.topbar,
+.page-content {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* =============================
+   ✅ TOPBAR
+============================= */
+.topbar {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 22px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(1, 47, 83, 0.12);
+}
+
+.topbar-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #012F53;
+}
+
+/* =============================
+   ✅ PAGE CONTENT
+============================= */
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  background: transparent; /* ✅ para kita watermark */
+}
+
+/* =============================
+   ✅ DASHBOARD PAGE (Overview)
+============================= */
+.dashboard-content {
+  padding: 24px;
+  background: transparent; /* ✅ para kita watermark */
+  min-height: calc(100vh - 60px);
+}
+
+.dashboard-title {
+  font-size: 44px;
+  font-weight: 800;
+  color: #012F53;
+  margin-bottom: 18px;
+}
+
+/* TOP STATS */
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(1, 47, 83, 0.08);
+}
+
+.stat-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6d7c8b;
+  margin-bottom: 14px;
+}
+
+.stat-card p {
+  font-size: 28px;
+  font-weight: 800;
+  color: #012F53;
+  margin: 0;
+}
+
+/* PANELS */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 22px;
+}
+
+.panel-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(1, 47, 83, 0.08);
+}
+
+.panel-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #012F53;
+  margin: 4px 0 16px;
+}
+
+/* TABLE */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.panel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.panel-table thead th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  color: #7e8b97;
+  padding: 12px 10px;
+  border-bottom: 1px solid #ecf2f7;
+}
+
+.panel-table tbody td {
+  padding: 14px 10px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1f2d3d;
+}
+
+/* STATUS BADGES */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-block;
+  text-transform: uppercase;
+}
+
+.status-badge.pending {
+  background: #ffe5e5;
+  color: #e74c3c;
+}
+
+.status-badge.active {
+  background: #fff0d9;
+  color: #d68910;
+}
+
+.status-badge.resolved {
+  background: #ddf7ee;
+  color: #1eaa75;
+}
+
+.status-badge.approved {
+  background: #ddf7ee;
+  color: #1eaa75;
+}
+
+.status-badge.rejected {
+  background: #ffe0e0;
+  color: #c0392b;
+}
+
+/* =============================
+   ✅ RESPONSIVE
+============================= */
+@media (max-width: 1100px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-title {
+    font-size: 34px;
+  }
+}
+
+
+
