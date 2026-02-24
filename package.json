@@ -1,0 +1,14 @@
+{
+  "name": "agapay-web",
+  "version": "1.0.0",
+  "description": "AGAPAY Web Admin Application",
+  "scripts": {
+    "start": "cd agapay-web-admin && npm start",
+    "build": "cd agapay-web-admin && npm run build",
+    "test": "cd agapay-web-admin && npm test",
+    "eject": "cd agapay-web-admin && npm run eject"
+  },
+  "workspaces": [
+    "agapay-web-admin"
+  ]
+}
