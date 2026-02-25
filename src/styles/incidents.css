@@ -38,40 +38,79 @@
   font-weight: 900;
 }
 
-/* NOTIFICATION STACK */
+/* ================= RIGHT FLOATING STACK ================= */
+
+/* ================= RIGHT FLOATING STACK — SMOOTH OFFSET ================= */
+
 .inc-notification-stack {
   position: fixed;
-  top: 20px;
-  right: 20px;
+
+  top: 24px;
+  right: 24px;                 /* 👈 hindi dikit */
+
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-width: 380px;
-  z-index: 2000;
-  max-height: 80vh;
+  gap: 18px;
+
+  max-height: calc(100vh - 48px); /* 👈 may margin top/bottom */
   overflow-y: auto;
+
+  z-index: 9999;
+  pointer-events: none;
+
+  padding-right: 6px;          /* 👈 extra breathing space */
 }
+
+/* ================= LARGE ALERT CARD ================= */
 
 .inc-notification-item {
-  background: #fff3cd;
-  border: 2px solid #ffc107;
-  border-left: 5px solid #ff6b6b;
-  border-radius: 12px;
-  padding: 14px;
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.25);
-  animation: slideIn 0.3s ease-out;
+  pointer-events: auto;
+
+  background: linear-gradient(135deg, #ff2e2e, #b30000);
+  color: white;
+
+  border-radius: 18px;
+  padding: 22px 26px;
+
+  width: min(92vw, 520px);   /* 👈 MAS MALAKI */
+
+  border-left: 7px solid #fff;
+
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.55),
+    0 0 35px rgba(255, 0, 0, 0.75);
+
+  animation: alertSlide 0.35s ease-out,
+             pulseGlow 1.4s infinite alternate;
 }
 
-@keyframes slideIn {
+/* SLIDE FROM RIGHT */
+@keyframes alertSlide {
   from {
-    transform: translateX(400px);
+    transform: translateX(160px) scale(0.95);
     opacity: 0;
   }
   to {
-    transform: translateX(0);
+    transform: translateX(0) scale(1);
     opacity: 1;
   }
 }
+
+/* EMERGENCY GLOW */
+@keyframes pulseGlow {
+  from {
+    box-shadow:
+      0 14px 36px rgba(0, 0, 0, 0.55),
+      0 0 24px rgba(255, 0, 0, 0.6);
+  }
+  to {
+    box-shadow:
+      0 14px 36px rgba(0, 0, 0, 0.7),
+      0 0 48px rgba(255, 0, 0, 1);
+  }
+}
+
+/* ================= HEADER ================= */
 
 .inc-notif-header {
   display: flex;
@@ -81,30 +120,32 @@
 }
 
 .inc-notif-title {
-  font-size: 14px;
+  font-size: 18px;   /* 👈 mas malaki */
   font-weight: 900;
-  color: #ff6b6b;
-  margin: 0;
+  letter-spacing: 1px;
 }
+
+/* CLOSE BUTTON */
 
 .inc-notif-close {
   background: none;
   border: none;
-  color: #999;
+  color: #ffdede;
   cursor: pointer;
-  font-size: 20px;
-  padding: 0;
-  transition: color 0.2s;
+  font-size: 24px;
+  padding: 0 6px;
+  transition: 0.2s;
 }
 
 .inc-notif-close:hover {
-  color: #ff6b6b;
+  color: #ffffff;
 }
 
+/* ================= BODY ================= */
+
 .inc-notif-body {
-  font-size: 13px;
-  color: #333;
-  line-height: 1.5;
+  font-size: 15px;  /* 👈 mas readable */
+  line-height: 1.6;
 }
 
 .inc-notif-body p {
@@ -112,8 +153,8 @@
 }
 
 .inc-notif-time {
-  font-size: 11px;
-  color: #999;
+  font-size: 12px;
+  opacity: 0.85;
   margin-top: 8px !important;
 }
 
