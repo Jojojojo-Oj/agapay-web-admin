@@ -15,8 +15,8 @@ const DEFAULT_CENTER = { lat: 14.649, lng: 120.970 }; // Caloocan City South
 const MAP_HEIGHT = 550; // px
 const MARKER_WIDTH = 45; // px
 const MARKER_HEIGHT = 50; // px
-const RESCUER_MARKER_WIDTH = 36; // px
-const RESCUER_MARKER_HEIGHT = 42; // px
+const RESCUER_MARKER_WIDTH = 50; // px
+const RESCUER_MARKER_HEIGHT = 56; // px
 
 const Dashboard = () => {
   const [incidents, setIncidents] = useState([]);
