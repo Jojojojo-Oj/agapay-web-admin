@@ -20,16 +20,44 @@ function App() {
   // ✅ IMPORTANT FIX: Landing page first
   useEffect(() => {
     const path = window.location.pathname;
+    const isAuthenticated =
+      sessionStorage.getItem("agapay_admin_logged_in") === "true";
 
     if (path === "/") {
       // Kapag root, pupunta sa landing page mo
-      window.location.href = "/landing.html";
+      window.location.replace("/landing.html");
+      return;
+    }
+
+    if (!isAuthenticated) {
+      window.location.replace("/login-2.html");
       return;
     }
 
     if (path === "/dashboard") {
       setPage("dashboard");
     }
+  }, []);
+
+  useEffect(() => {
+    const path = window.location.pathname;
+    const isAuthenticated =
+      sessionStorage.getItem("agapay_admin_logged_in") === "true";
+
+    if (!isAuthenticated || path !== "/dashboard") return;
+
+    window.history.pushState(null, "", window.location.href);
+
+    const handleBack = () => {
+      window.history.pushState(null, "", window.location.href);
+      window.location.reload();
+    };
+
+    window.addEventListener("popstate", handleBack);
+
+    return () => {
+      window.removeEventListener("popstate", handleBack);
+    };
   }, []);
 
   return (

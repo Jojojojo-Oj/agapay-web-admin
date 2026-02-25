@@ -126,6 +126,10 @@ body{
 </div>
 
 <script>
+if (sessionStorage.getItem("agapay_admin_logged_in") === "true") {
+  window.location.replace("/dashboard");
+}
+
 function handleLogin(e){
     e.preventDefault();
 
@@ -142,7 +146,8 @@ function handleLogin(e){
         const correctPass = "1234";
 
         if(user === correctUser && pass === correctPass){
-            window.location.href = "/dashboard";
+          sessionStorage.setItem("agapay_admin_logged_in", "true");
+          window.location.replace("/dashboard");
         } else {
             alert("❌ Invalid username or password");
             btn.innerText = "Login";

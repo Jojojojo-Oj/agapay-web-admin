@@ -81,7 +81,8 @@ const Sidebar = ({ setPage }) => {
           onClick={() => {
             const confirmLogout = window.confirm("Are you sure you want to logout?");
             if (confirmLogout) {
-              window.location.href = "/landing.html";
+              sessionStorage.removeItem("agapay_admin_logged_in");
+              window.location.replace("/landing.html");
             }
           }}
         >
