@@ -7,46 +7,7 @@
 
   <!-- Montserrat Font -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- IMPORTANT: absolute path para hindi ma-break sa React -->
-  <link rel="stylesheet" href="/style.css" />
-
-  <!-- FIX: ibalik ang default scrollbar at spacing -->
-  <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    overflow-y: auto !important;
-    overflow-x: hidden;
-  }
-
-  /* ===== LOW-OPACITY MINIMAL SCROLLBAR ===== */
-
-  /* Chrome, Edge, Safari */
-  ::-webkit-scrollbar {
-    width: 6px;          /* manipis */
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15); /* very light */
-    border-radius: 10px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.25);
-  }
-
-  /* Firefox */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0,0,0,0.15) transparent;
-  }
-</style>
-
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -55,8 +16,8 @@
   <div class="container nav-inner">
 
      <div class="logo">
-      <a href="login-2.html">
-        <img src="/logo.png" alt="AGAPAY">
+      <a href="login-2.html">  <!-- LALAGAY YUNG LOG IN for ADMIN-->
+        <img src="logo.png" alt="AGAPAY">
       </a>
       <span>AGAPAY</span>
     </div>
@@ -93,24 +54,26 @@
       </p>
 
       <div class="hero-actions">
-        <a href="register.html" class="btn-primary">Register as Volunteer</a>
+        <a href="Register.html" class="btn-primary">Register as Volunteer</a>
         <a href="#features" class="btn-secondary light">How It Works</a>
       </div>
     </div>
 
     <div class="hero-card">
       <div class="mockup">
-        <video autoplay muted loop playsinline>
-          <source src="/mockup.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-      </div>
+  <video autoplay muted loop playsinline>
+    <source src="mockup.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+
     </div>
 
   </div>
 </section>
 
-<!-- ABOUT -->
+<!-- ABOUT / COMMAND PREVIEW -->
 <section class="about" id="about">
   <div class="container about-grid">
 
@@ -145,22 +108,25 @@
       </div>
     </div>
 
+    <!-- COMMAND CENTER UI -->
     <div class="command-panel">
       <div class="live-panel">
-        <h3>Real-Time Emergency Workflow</h3>
-        <ul>
-          <li>🆘 SOS report submitted by resident</li>
-          <li>🛡️ Admin verifies incident details</li>
-          <li>📍 Case appears on responder dashboard</li>
-          <li>🚑 Responder dispatched with live route</li>
-          <li>✅ Arrival confirmed via GPS</li>
-          <li>📝 Rescue operation in progress</li>
-          <li>📦 Case resolved and logged</li>
-        </ul>
-      </div>
-    </div>
+  <h3>Real-Time Emergency Workflow</h3>
+  <ul>
+    <li>🆘 SOS report submitted by resident</li>
+    <li>🛡️ Admin verifies incident details</li>
+    <li>📍 Case appears on responder dashboard</li>
+    <li>🚑 Responder dispatched with live route</li>
+    <li>✅ Arrival confirmed via GPS</li>
+    <li>📝 Rescue operation in progress</li>
+    <li>📦 Case resolved and logged</li>
+  </ul>
+</div>
+
+
   </div>
 </section>
+
 
 <!-- FEATURES -->
 <section class="features" id="features">
@@ -176,9 +142,19 @@
 
       <div class="feature-box">
         <div class="feature-image">
-          <img src="/imagesflow1.png" alt="">
-        </div>
+            <img src="location.jpg" alt="">
+            </div>
+
         <div class="feature-content">
+          <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"
+          stroke="white" stroke-width="2"/>
+          <circle cx="12" cy="10" r="2.5"
+            stroke="white" stroke-width="2"/>
+         </svg>
+        </div>
+
           <h3>Location Tracking</h3>
           <p>Always visible, no matter where you are during emergencies.</p>
         </div>
@@ -186,9 +162,20 @@
 
       <div class="feature-box">
         <div class="feature-image">
-          <img src="/imagesflow1.png" alt="">
-        </div>
+            <img src="sos.jpg" alt="">
+            </div>
         <div class="feature-content">
+          <div class="feature-icon">
+  <svg viewBox="0 0 24 24" fill="none">
+  <path d="M12 3v4M5.6 5.6l2.8 2.8M3 12h4M5.6 18.4l2.8-2.8
+           M12 17v4M18.4 18.4l-2.8-2.8M17 12h4M18.4 5.6l-2.8 2.8"
+        stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="12" cy="12" r="3"
+          stroke="white" stroke-width="2"/>
+</svg>
+
+</div>
+
           <h3>SOS Alert Dispatch</h3>
           <p>Instant SOS alerts sent to responders for immediate action.</p>
         </div>
@@ -196,17 +183,193 @@
 
       <div class="feature-box">
         <div class="feature-image">
-          <img src="/imagesflow1.png" alt="">
-        </div>
+            <img src="preparedness.jpg" alt="">
+            </div>
+  <div class="feature-content">
+    <div class="feature-icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9"
+                stroke="white" stroke-width="2"/>
+        <path d="M12 8v5M12 16h.01"
+              stroke="white" stroke-width="2"
+              stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <h3>Preparedness & Safety Guides</h3>
+    <p>Access clear and reliable tips on what to do before, during, and after different types of disasters.</p>
+  </div>
+</div>
+
+
+      <div class="feature-box">
+        <div class="feature-image">
+            <img src="centralized.jpg" alt="">
+            </div>
         <div class="feature-content">
-          <h3>Preparedness & Safety Guides</h3>
-          <p>Clear disaster safety tips.</p>
+          <div class="feature-icon">
+  <svg viewBox="0 0 24 24" fill="none">
+  <rect x="4" y="10" width="16" height="10" rx="2"
+        stroke="white" stroke-width="2"/>
+  <path d="M8 10V7a4 4 0 018 0v3"
+        stroke="white" stroke-width="2"/>
+ </svg>
+
+</div>
+
+          <h3>Centralized System Monitoring</h3>
+          <p>Real-time monitoring for responders and authorities.</p>
+        </div>
+      </div>
+
+      <div class="feature-box">
+        <div class="feature-image">
+            <img src="community.jpg" alt="">
+            </div>
+  <div class="feature-content">
+    <div class="feature-icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <!-- chat bubble -->
+        <path d="M4 5h16v10H8l-4 4V5z"
+              stroke="white" stroke-width="2"
+              stroke-linejoin="round"/>
+        <!-- notification dot -->
+        <circle cx="17" cy="8" r="1.5"
+                fill="white"/>
+      </svg>
+    </div>
+
+    <h3>Community Updates</h3>
+    <p>A shared space for users to post updates, photos, and receive official disaster events and announcements.</p>
+  </div>
+</div>
+
+
+      <div class="feature-box">
+        <div class="feature-image">
+            <img src="evacuation.jpg" alt="">
+            </div>
+  <div class="feature-content">
+    <div class="feature-icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M3 10l9-7 9 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M5 10v10h14V10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 14v4M10 16h4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <h3>Evacuation & Facility Finder</h3>
+    <p>Locate evacuation routes and nearby hospitals, shelters, and emergency facilities in real time.</p>
+  </div>
+</div>
+
+    </div>
+    
+  </div>
+</section>
+
+<!-- SYSTEM FLOW TIMELINE -->
+<section class="flow-section" id="system-flow">
+  <div class="container">
+
+    <h2 class="flow-title">How AGAPAY Handles an Emergency</h2>
+    <p class="flow-sub">
+      From SOS report to case resolution, here is the complete verified emergency workflow.
+    </p>
+
+    <div class="timeline">
+
+      <!-- STEP 1 -->
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <span class="step">Step 1</span>
+          <h3>Incident is Reported by Resident</h3>
+          <p>Residents submit an emergency report with location, details, and photo proof through the app.</p>
+        </div>
+        <div class="timeline-image">
+          <img src="step1.jpg" alt="">
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <span class="step">Step 2</span>
+          <h3>Admin Verifies the Emergency</h3>
+          <p>The admin reviews the report, checks the evidence, and validates if the incident is a legitimate emergency before dispatching responders.</p>
+        </div>
+        <div class="timeline-image">
+          <img src="step2.jpg" alt="">
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <span class="step">Step 3</span>
+          <h3>Verified Case Appears on Responder Dashboard</h3>
+          <p>Once approved, the incident becomes visible to responders with complete victim and location details.</p>
+        </div>
+        <div class="timeline-image">
+          <img src="step3.jpg" alt="">
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <span class="step">Step 4</span>
+          <h3>Responder Navigates to the Location</h3>
+          <p>The system provides real-time map tracking and optimal route guidance to the incident site.</p>
+        </div>
+        <div class="timeline-image">
+          <img src="step4.jpg" alt="">
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <span class="step">Step 5</span>
+          <h3>Arrival is Confirmed via GPS</h3>
+          <p>Responders confirm their arrival with timestamp and GPS verification inside the app.</p>
+        </div>
+        <div class="timeline-image">
+          <img src="step5.jpg" alt="">
+        </div>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <span class="step">Step 6</span>
+          <h3>Rescue Operation is Ongoing</h3>
+          <p>The case status updates while responders perform assistance and rescue operations.</p>
+        </div>
+        <div class="timeline-image">
+          <img src="step6.jpg" alt="">
+        </div>
+      </div>
+
+      <!-- STEP 7 -->
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <span class="step">Step 7</span>
+          <h3>Case is Resolved and Logged</h3>
+          <p>After successful response, the responder confirms resolution and the system logs the case as completed.</p>
+        </div>
+        <div class="timeline-image">
+          <img src="step7.jpg" alt="">
         </div>
       </div>
 
     </div>
   </div>
 </section>
+
+
+
+
 
 <!-- SYSTEM / TEAM -->
 <section class="team" id="team">
@@ -216,21 +379,25 @@
     <h2>Built for Communities. Designed for Responders.</h2>
 
     <p>
-      AGAPAY supports coordination between residents, responders,
-      and local disaster offices.
+      AGAPAY is developed to support coordination between residents,
+      responders, and the Disaster Risk Reduction and Management Office.
+      The system improves response efficiency during disasters and
+      medical emergencies through centralized monitoring and real-time data.
     </p>
 
     <a href="#" class="btn-secondary light">View System Overview</a>
   </div>
 </section>
 
-<!-- CONTACT -->
 <section class="contact-section" id="contact">
   <div class="contact-container">
 
+    <!-- LEFT : FORM -->
     <div class="contact-form">
       <h2>Stay Connected</h2>
-      <p class="subtext">Need assistance? Reach out anytime.</p>
+      <p class="subtext">
+        Need assistance or system support? Reach out anytime.
+      </p>
 
       <form>
         <input type="text" placeholder="Full Name" required />
@@ -240,15 +407,34 @@
       </form>
     </div>
 
+    <!-- RIGHT : SUPPORT INFO -->
     <div class="support-card">
       <h3>AGAPAY Support Center</h3>
-      <p>📍 Caloocan City South, Philippines</p>
-      <p>📞 24/7 Hotline: 0912-345-6789</p>
-      <p>✉️ support@agapay.ph</p>
+
+      <div class="support-item">
+        <span>📍</span>
+        <p>Caloocan City South, Philippines</p>
+      </div>
+
+      <div class="support-item">
+        <span>📞</span>
+        <p>24/7 Emergency Hotline: 0912-345-6789</p>
+      </div>
+
+      <div class="support-item">
+        <span>✉️</span>
+        <p>support@agapay.ph</p>
+      </div>
+
+      <div class="support-note">
+        Our response team monitors this channel 24/7 for system issues,
+        SOS concerns, Clean & Safe reports, and volunteer coordination.
+      </div>
     </div>
 
   </div>
 </section>
+
 
 <!-- FOOTER -->
 <footer class="footer">
