@@ -245,6 +245,54 @@ export const subscribeToIncidentChats = (chatId, callback, onError) => {
 };
 
 /**
+ * Get the latest resolution log for an incident
+ * @param {string} reportId - Incident report ID
+ * @returns {Promise<Object|null>} Latest resolution log data or null
+ */
+export const getLatestIncidentResolutionLog = async (reportId) => {
+  if (!reportId) return null;
+
+  try {
+    const logsRef = collection(db, "sos_reports", reportId, "resolution_logs");
+    const logsSnap = await getDocs(logsRef);
+
+    if (logsSnap.empty) return null;
+
+    const logs = logsSnap.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data(),
+    }));
+
+    const getTimeValue = (value) => {
+      if (!value) return 0;
+      if (value?.toDate) return value.toDate().getTime();
+      if (value instanceof Date) return value.getTime();
+
+      const parsed = new Date(value).getTime();
+      return Number.isNaN(parsed) ? 0 : parsed;
+    };
+
+    logs.sort((a, b) => {
+      const timeA = Math.max(
+        getTimeValue(a.resolvedAt),
+        getTimeValue(a.resolvedAtIso),
+        getTimeValue(a.createdAt)
+      );
+      const timeB = Math.max(
+        getTimeValue(b.resolvedAt),
+        getTimeValue(b.resolvedAtIso),
+        getTimeValue(b.createdAt)
+      );
+      return timeB - timeA;
+    });
+
+    return logs[0] || null;
+  } catch (_) {
+    return null;
+  }
+};
+
+/**
  * Resolve a user's selfie URL from Users collection using sender ID
  * @param {string} senderId - Sender/user UID
  * @returns {Promise<string>} Selfie URL or empty string

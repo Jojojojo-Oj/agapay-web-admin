@@ -7,6 +7,8 @@ import {
   filterIncidents,
   subscribeToIncidentChats,
   getUserSelfieUrl,
+  getLatestIncidentResolutionLog,
+  getUserDisplayName,
   getUserDisplayNames,
 } from "../services/incidentsService";
 import { getAddressForLocation, parseCoordinates } from "../services/geocode";
@@ -26,7 +28,13 @@ export default function ResolvedCases() {
   const [chatAvatarMap, setChatAvatarMap] = useState({});
   const [previewRescuerNames, setPreviewRescuerNames] = useState([]);
   const [isPreviewRescuersLoading, setIsPreviewRescuersLoading] = useState(false);
+  const [remarksReport, setRemarksReport] = useState(null);
+  const [remarksLog, setRemarksLog] = useState(null);
+  const [isRemarksLoading, setIsRemarksLoading] = useState(false);
+  const [remarksError, setRemarksError] = useState("");
+  const [remarksAcceptedByName, setRemarksAcceptedByName] = useState("");
   const chatBodyRef = useRef(null);
+  const remarksRequestRef = useRef(0);
 
   useEffect(() => {
     const unsub = subscribeToIncidents((data) => {
@@ -247,6 +255,51 @@ export default function ResolvedCases() {
     return Boolean(currentUid && message?.senderId === currentUid);
   };
 
+  const formatDateTime = (value) => {
+    if (!value) return "—";
+
+    const date = value?.toDate ? value.toDate() : new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+
+    return date.toLocaleString();
+  };
+
+  const closeRemarksModal = () => {
+    setRemarksReport(null);
+    setRemarksLog(null);
+    setRemarksError("");
+    setRemarksAcceptedByName("");
+    setIsRemarksLoading(false);
+  };
+
+  const openRemarksModal = async (report) => {
+    setRemarksReport(report);
+    setRemarksLog(null);
+    setRemarksError("");
+    setRemarksAcceptedByName("");
+    setIsRemarksLoading(true);
+
+    const requestId = ++remarksRequestRef.current;
+
+    try {
+      const [resolutionLog, acceptedByName] = await Promise.all([
+        getLatestIncidentResolutionLog(report.id),
+        report.acceptedBy ? getUserDisplayName(report.acceptedBy) : Promise.resolve(""),
+      ]);
+
+      if (requestId !== remarksRequestRef.current) return;
+
+      setRemarksLog(resolutionLog);
+      setRemarksAcceptedByName(acceptedByName || "");
+      setIsRemarksLoading(false);
+    } catch (_) {
+      if (requestId !== remarksRequestRef.current) return;
+
+      setRemarksError("Unable to load resolved information right now.");
+      setIsRemarksLoading(false);
+    }
+  };
+
   return (
     <div className="inc-page">
       <div className="inc-header">
@@ -313,6 +366,7 @@ export default function ResolvedCases() {
                   <th className="location-header">Location</th>
                   <th>Status</th>
                   <th>Preview</th>
+                  <th>Remarks</th>
                   <th>View Chats</th>
                 </tr>
               </thead>
@@ -339,6 +393,16 @@ export default function ResolvedCases() {
                         onClick={() => setPreviewReport(report)}
                       >
                         View
+                      </button>
+                    </td>
+
+                    <td>
+                      <button
+                        type="button"
+                        className="inc-btn inc-btn-success"
+                        onClick={() => openRemarksModal(report)}
+                      >
+                        Remarks
                       </button>
                     </td>
 
@@ -543,6 +607,77 @@ export default function ResolvedCases() {
                   <img src={previewReport.imagePath} alt="Incident" />
                 ) : (
                   <div className="inc-no-image">No image available</div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {remarksReport && (
+        <div className="inc-modal-overlay" onClick={closeRemarksModal}>
+          <div className="inc-modal-card inc-modal-card-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="inc-modal-header">
+              <div>
+                <div className="inc-modal-title">Resolved Information</div>
+                <div className="inc-modal-subtitle">
+                  {remarksReport.senderName || "Unknown"} • {remarksReport.disasterType || "Unknown"}
+                </div>
+              </div>
+
+              <button type="button" className="inc-btn inc-btn-outline" onClick={closeRemarksModal}>
+                Close
+              </button>
+            </div>
+
+            <div className="inc-preview-body">
+              <div className="inc-preview-left">
+                <div className="inc-preview-row">
+                  <span className="inc-preview-label">Incident ID</span>
+                  <span className="inc-preview-value">{formatIncidentDisplayId(remarksReport)}</span>
+                </div>
+
+                <div className="inc-preview-row">
+                  <span className="inc-preview-label">Accepted At</span>
+                  <span className="inc-preview-value">{formatDateTime(remarksReport.acceptedAt)}</span>
+                </div>
+
+                <div className="inc-preview-row">
+                  <span className="inc-preview-label">Accepted By</span>
+                  <span className="inc-preview-value">
+                    {remarksAcceptedByName || remarksReport.acceptedBy || "—"}
+                  </span>
+                </div>
+
+                <div className="inc-preview-row">
+                  <span className="inc-preview-label">Resolved At</span>
+                  <span className="inc-preview-value">
+                    {isRemarksLoading
+                      ? "Loading..."
+                      : formatDateTime(remarksLog?.resolvedAt || remarksLog?.resolvedAtIso)}
+                  </span>
+                </div>
+
+                <div className="inc-preview-divider" />
+
+                <div className="inc-preview-desc-title">Remarks</div>
+                <div className="inc-preview-desc">
+                  {isRemarksLoading
+                    ? "Loading resolved remarks..."
+                    : remarksError
+                    ? remarksError
+                    : remarksLog?.additionalDetails || "No remarks provided."}
+                </div>
+              </div>
+
+              <div className="inc-preview-right">
+                <div className="inc-preview-image-title">Proof Image</div>
+                {isRemarksLoading ? (
+                  <div className="inc-no-image">Loading proof image...</div>
+                ) : remarksLog?.proofImageUrl ? (
+                  <img src={remarksLog.proofImageUrl} alt="Resolution proof" />
+                ) : (
+                  <div className="inc-no-image">No proof image available</div>
                 )}
               </div>
             </div>
