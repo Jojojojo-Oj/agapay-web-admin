@@ -9,6 +9,10 @@ import fireMarker from "../assets/markers/fireMarker.png";
 import earthquakeMarker from "../assets/markers/earthquakeMarker.png";
 import typhoonMarker from "../assets/markers/typhoonMarker.png";
 import medicalMarker from "../assets/markers/medicalMarker.png";
+import landslideMarker from "../assets/markers/landslideMarker.png";
+import tsunamiMarker from "../assets/markers/tsunamiMarker.png";
+import policeMarker from "../assets/markers/policeMarker.png";
+import volcanMarker from "../assets/markers/volcanMarker.png";
 import rescuerMarker from "../assets/markers/rescuerMarker.png";
 
 const DEFAULT_CENTER = { lat: 14.649, lng: 120.970 }; // Caloocan City South
@@ -85,6 +89,10 @@ const Dashboard = () => {
       if (t.includes("earthquake")) return earthquakeMarker;
       if (t.includes("typhoon")) return typhoonMarker;
       if (t.includes("flood") || t.includes("medical")) return medicalMarker;
+      if (t.includes("landslide")) return landslideMarker;
+      if (t.includes("tsunami")) return tsunamiMarker;
+      if (t.includes("police")) return policeMarker;
+      if (t.includes("volcano") || t.includes("volcan")) return volcanMarker;
       return null;
     };
 
@@ -94,6 +102,10 @@ const Dashboard = () => {
       if (t.includes("flood")) return "#22c55e";
       if (t.includes("typhoon")) return "#2563eb";
       if (t.includes("earthquake")) return "#a16207";
+      if (t.includes("landslide")) return "#92400e";
+      if (t.includes("tsunami")) return "#0ea5e9";
+      if (t.includes("police")) return "#4338ca";
+      if (t.includes("volcano") || t.includes("volcan")) return "#b91c1c";
       return "#0ea5e9";
     };
 

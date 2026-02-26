@@ -429,6 +429,10 @@ export default function Incidents() {
     if (normalizedType.includes("earthquake")) return "EQ";
     if (normalizedType.includes("medical")) return "MD";
     if (normalizedType.includes("typhoon")) return "TYP";
+    if (normalizedType.includes("tsunami")) return "TSNM";
+    if (normalizedType.includes("landslide")) return "LNDS";
+    if (normalizedType.includes("police")) return "PINC";
+    if (normalizedType.includes("volcano") || normalizedType.includes("volcan")) return "VOLC";
 
     return "INC";
   };
@@ -738,8 +742,9 @@ export default function Incidents() {
                         type="button"
                         className="inc-btn inc-btn-success"
                         onClick={() => handleStatusChange(r.id, "active")}
+                        disabled={r.status === "active"}
                       >
-                        Post
+                        {r.status === "active" ? "Posted" : "Post"}
                       </button>
 
                       <button

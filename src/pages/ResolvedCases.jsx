@@ -105,6 +105,10 @@ export default function ResolvedCases() {
     if (normalizedType.includes("earthquake")) return "EQ";
     if (normalizedType.includes("medical")) return "MD";
     if (normalizedType.includes("typhoon")) return "TYP";
+    if (normalizedType.includes("tsunami")) return "TSNM";
+    if (normalizedType.includes("landslide")) return "LNDS";
+    if (normalizedType.includes("police")) return "PINC";
+    if (normalizedType.includes("volcano") || normalizedType.includes("volcan")) return "VOLC";
 
     return "INC";
   };
