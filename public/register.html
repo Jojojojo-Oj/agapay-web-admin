@@ -2,21 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AGAPAY – Emergency Response App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AGAPAY – Rescuer Application</title>
 
-  <!-- Montserrat Font -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css">
-
+  <link rel="stylesheet" href="register.css">
 </head>
 <body>
 
-<!-- NAVBAR -->
 <header class="navbar">
   <div class="container nav-inner">
-
-    <!-- ONLY IMAGE IS A LINK -->
     <div class="logo">
       <a href="landing.html">
         <img src="logo.png" alt="AGAPAY">
@@ -26,26 +21,21 @@
 
     <nav class="nav-links">
       <a href="landing.html#about">About</a>
-      <a href="landing.html#system-flow">How It Works</a>
-      <a href="landing.html#features">System</a>
+      <a href="landing.html#features">How It Works</a>
+      <a href="landing.html#team">System</a>
       <a href="landing.html#contact" class="btn-primary">Contact</a>
     </nav>
-    
   </div>
 
   <div class="reg-topbar">
-  <div class="container">
-    <a href="landing.html">← Back to Home</a>
+    <div class="container">
+      <a href="landing.html">← Back to Home</a>
+    </div>
   </div>
-</div>
-
 </header>
 
-
-<!-- HEADER -->
 <section class="reg-header">
-  <div class="container">
-
+  <div class="container narrow">
     <h1>Rescuer Application</h1>
     <p>
       Organization-affiliated rescuers only. Applicants must belong to a recognized
@@ -54,78 +44,139 @@
   </div>
 </section>
 
-<!-- FORM -->
 <section class="reg-section">
-  <div class="reg-card">
+  <div class="reg-card narrow">
 
-    <div class="reg-title">
-      <h2>Apply as Organization-Affiliated Rescuer</h2>
-      <span>All submissions are reviewed by AGAPAY administrators</span>
+<div class="reg-title">
+  <h2>Apply as Organization-Affiliated Rescuer</h2>
+  <span>All submissions undergo verification by AGAPAY administrators</span>
+</div>
+
+<form id="multiForm" enctype="multipart/form-data">
+
+  <!-- STEPPER -->
+  <div class="steps">
+    <div class="step active">1</div>
+    <div class="step">2</div>
+    <div class="step">3</div>
+    <div class="step">4</div>
+    <div class="step">5</div>
+    <div class="step">6</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="form-step active">
+    <h3>Organization Information</h3>
+    <div class="grid-2">
+      <input type="text" placeholder="Organization Name *">
+      <select>
+        <option>Type of Organization *</option>
+        <option>NGO</option>
+        <option>Private Rescue Group</option>
+        <option>Barangay Rescue Team</option>
+        <option>School Volunteer Group</option>
+        <option>Faith-based Organization</option>
+      </select>
+      <input type="text" placeholder="Registration Number">
+      <input type="text" placeholder="Year Established">
+      <input type="text" placeholder="Area of Operation">
+      <input type="text" placeholder="Office Address">
+      <input type="text" placeholder="Official Contact Number">
+      <input type="email" placeholder="Official Email">
+      <input type="text" placeholder="Social Media Page">
     </div>
+  </div>
 
-    <form class="reg-form">
+  <!-- STEP 2 -->
+  <div class="form-step">
+    <h3>Leader / Lead Rescuer</h3>
+    <div class="grid-2">
+      <input type="text" placeholder="Full Name *">
+      <input type="text" placeholder="Position / Title">
+      <input type="text" placeholder="Contact Number">
+      <input type="email" placeholder="Email Address">
+      <input type="text" placeholder="Years of Experience">
 
-      <div class="form-block">
-        <h3>Personal Information</h3>
-        <div class="grid-2">
-          <input type="text" placeholder="First Name *">
-          <input type="text" placeholder="Last Name *">
-          <input type="email" placeholder="Email *">
-          <input type="text" placeholder="Phone *">
-          <input type="date">
-          <input type="text" placeholder="Residence Address (Caloocan South) *">
-        </div>
-      </div>
+      <label>Government ID Upload</label>
+      <input type="file" accept=".jpg,.jpeg,.png,.pdf">
+    </div>
+  </div>
 
-      <div class="form-block">
-        <h3>Government ID</h3>
-        <div class="grid-2">
-          <select><option>ID Type *</option></select>
-          <input type="text" placeholder="ID Number *">
-          <input type="text" placeholder="ID Front URL">
-          <input type="text" placeholder="ID Back URL">
-        </div>
-      </div>
+  <!-- STEP 3 -->
+  <div class="form-step">
+    <h3>Volunteer Team Composition</h3>
+    <div class="grid-2">
+      <input type="number" placeholder="Total Active Members">
+      <input type="number" placeholder="Certified First Aiders">
+      <input type="number" placeholder="EMT / Paramedic Members">
+    </div>
+  </div>
 
-      <div class="form-block">
-        <h3>Organization Details</h3>
-        <div class="grid-2">
-          <select><option>Organization Type *</option></select>
-          <input type="text" placeholder="Organization Name *">
-          <input type="text" placeholder="Department / Unit">
-          <input type="text" placeholder="Designation">
-          <input type="text" placeholder="Employee / Badge No.">
-          <input type="email" placeholder="Official Email">
-          <input type="text" placeholder="Supervisor Name">
-          <input type="text" placeholder="Supervisor Contact">
-          <input type="text" placeholder="Authorization / Accreditation Letter URL *">
-        </div>
-      </div>
+  <!-- STEP 4 -->
+  <div class="form-step">
+    <h3>Required Documents</h3>
+    <div class="grid-2">
 
-      <div class="submit-row">
-        <button type="submit">Submit Application</button>
-        <p>Applications will appear as <strong>Pending</strong> for review.</p>
-      </div>
+      <label>Registration Certificate</label>
+      <input type="file" accept=".jpg,.jpeg,.png,.pdf">
 
-    </form>
+      <label>List of Members</label>
+      <input type="file" accept=".jpg,.jpeg,.png,.pdf">
 
-    <!-- SUCCESS MODAL -->
+      <label>Training Certificates</label>
+      <input type="file" accept=".jpg,.jpeg,.png,.pdf">
+
+      <label>MOA with LGU</label>
+      <input type="file" accept=".jpg,.jpeg,.png,.pdf">
+
+      <label>Equipment Inventory</label>
+      <input type="file" accept=".jpg,.jpeg,.png,.pdf">
+
+      <label>Barangay Clearance</label>
+      <input type="file" accept=".jpg,.jpeg,.png,.pdf">
+
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="form-step">
+    <h3>Equipment & Capability</h3>
+    <div class="grid-2">
+      <input type="text" placeholder="Rescue Vehicle">
+      <input type="text" placeholder="Rescue Boat">
+      <input type="text" placeholder="Rope Equipment">
+      <input type="text" placeholder="Medical Kits">
+      <input type="text" placeholder="Communication Equipment">
+      <input type="text" placeholder="GPS Tracker">
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="form-step">
+    <h3>Compliance Agreement</h3>
+    <label class="check"><input type="checkbox"> Follow LGU protocols</label>
+    <label class="check"><input type="checkbox"> Agree to data privacy policy</label>
+    <label class="check"><input type="checkbox"> False info leads to ban</label>
+    <label class="check"><input type="checkbox"> Respond within jurisdiction</label>
+  </div>
+
+  <div class="step-buttons">
+    <button type="button" id="prevBtn">Back</button>
+    <button type="button" id="nextBtn">Next</button>
+  </div>
+
+</form>
+
+<!-- MODAL -->
 <div id="successModal" class="modal">
   <div class="modal-box">
-    <h3>Application Submitted ✅</h3>
-    <p>
-      Your application has been received and is now under review.
-      Our team will contact you through your email once verification is complete.
-    </p>
+    <h3>Application Submitted</h3>
+    <p>Your application is now under review.</p>
     <button onclick="closeModal()">Okay</button>
   </div>
 </div>
 
-
   </div>
-
-
-  
 </section>
 
 <footer class="footer">
@@ -135,22 +186,97 @@
   </div>
 </footer>
 
-
 <script>
-  const form = document.querySelector('.reg-form');
-  const modal = document.getElementById('successModal');
+let currentStep = 0;
 
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();   // stop actual submission
-    modal.style.display = 'flex';
-    form.reset();         // clear fields
+const steps = document.querySelectorAll(".form-step");
+const indicators = document.querySelectorAll(".step");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+const modal = document.getElementById("successModal");
+
+function showStep(i) {
+  steps.forEach(s => s.classList.remove("active"));
+  indicators.forEach(s => s.classList.remove("active"));
+
+  steps[i].classList.add("active");
+  indicators[i].classList.add("active");
+
+  prevBtn.style.display = i === 0 ? "none" : "inline-block";
+  nextBtn.textContent = i === steps.length - 1
+    ? "Submit Application"
+    : "Next";
+}
+
+/* ✅ VALIDATION PER STEP */
+function validateStep() {
+
+  const inputs = steps[currentStep].querySelectorAll("input, select");
+  let valid = true;
+
+  inputs.forEach(input => {
+
+    // CHECK TEXT / EMAIL / NUMBER
+    if (
+      input.type !== "file" &&
+      input.type !== "checkbox" &&
+      input.value.trim() === ""
+    ) {
+      valid = false;
+    }
+
+    // CHECK FILE UPLOAD
+    if (input.type === "file" && input.files.length === 0) {
+      valid = false;
+    }
+
   });
 
-  function closeModal() {
-    modal.style.display = 'none';
+  // CHECK CHECKBOXES (STEP 6)
+  if (currentStep === 5) {
+    const checks = steps[currentStep].querySelectorAll(
+      "input[type='checkbox']"
+    );
+    checks.forEach(c => {
+      if (!c.checked) valid = false;
+    });
   }
-</script>
 
+  if (!valid) {
+    alert("Please complete all required fields before proceeding.");
+  }
+
+  return valid;
+}
+
+/* NEXT BUTTON */
+nextBtn.onclick = () => {
+
+  // Validate first
+  if (!validateStep()) return;
+
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    showStep(currentStep);
+  } else {
+    // FINAL SUBMIT SUCCESS
+    modal.style.display = "flex";
+  }
+
+};
+
+/* BACK BUTTON */
+prevBtn.onclick = () => {
+  currentStep--;
+  showStep(currentStep);
+};
+
+function closeModal() {
+  modal.style.display = "none";
+}
+
+showStep(currentStep);
+</script>
 
 </body>
 </html>
