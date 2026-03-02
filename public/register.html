@@ -116,7 +116,6 @@
   <div class="form-step">
     <h3>Required Documents</h3>
     <div class="grid-2">
-
       <label>Registration Certificate</label>
       <input type="file" accept=".jpg,.jpeg,.png,.pdf">
 
@@ -134,7 +133,6 @@
 
       <label>Barangay Clearance</label>
       <input type="file" accept=".jpg,.jpeg,.png,.pdf">
-
     </div>
   </div>
 
@@ -153,11 +151,8 @@
 
   <!-- STEP 6 -->
   <div class="form-step">
-    <h3>Compliance Agreement</h3>
-    <label class="check"><input type="checkbox"> Follow LGU protocols</label>
-    <label class="check"><input type="checkbox"> Agree to data privacy policy</label>
-    <label class="check"><input type="checkbox"> False info leads to ban</label>
-    <label class="check"><input type="checkbox"> Respond within jurisdiction</label>
+    <h3>Review & Submit</h3>
+    <p>Please review your application before submission.</p>
   </div>
 
   <div class="step-buttons">
@@ -167,12 +162,37 @@
 
 </form>
 
-<!-- MODAL -->
+<!-- SUCCESS MODAL (AUTO CLOSE) -->
 <div id="successModal" class="modal">
   <div class="modal-box">
     <h3>Application Submitted</h3>
     <p>Your application is now under review.</p>
-    <button onclick="closeModal()">Okay</button>
+  </div>
+</div>
+
+<!-- AGREEMENT MODAL -->
+<div id="agreementModal" class="modal">
+  <div class="modal-box" style="max-width:520px; text-align:left">
+
+    <h3>Official Compliance Agreement</h3>
+
+    <p>By proceeding, you agree to the following:</p>
+
+    <label class="check">
+      <input type="checkbox" id="agree1">
+      Follow LGU Protocols
+    </label>
+
+    <label class="check">
+      <input type="checkbox" id="agree2">
+      Agree to the Data Privacy Policy
+    </label>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAgreement()">Cancel</button>
+      <button class="btn-submit" onclick="confirmSubmission()">Submit Application</button>
+    </div>
+
   </div>
 </div>
 
@@ -194,6 +214,7 @@ const indicators = document.querySelectorAll(".step");
 const nextBtn = document.getElementById("nextBtn");
 const prevBtn = document.getElementById("prevBtn");
 const modal = document.getElementById("successModal");
+const agreementModal = document.getElementById("agreementModal");
 
 function showStep(i) {
   steps.forEach(s => s.classList.remove("active"));
@@ -208,71 +229,59 @@ function showStep(i) {
     : "Next";
 }
 
-/* ✅ VALIDATION PER STEP */
 function validateStep() {
-
   const inputs = steps[currentStep].querySelectorAll("input, select");
   let valid = true;
 
   inputs.forEach(input => {
-
-    // CHECK TEXT / EMAIL / NUMBER
-    if (
-      input.type !== "file" &&
-      input.type !== "checkbox" &&
-      input.value.trim() === ""
-    ) {
+    if (input.type !== "file" && input.value.trim() === "")
       valid = false;
-    }
 
-    // CHECK FILE UPLOAD
-    if (input.type === "file" && input.files.length === 0) {
+    if (input.type === "file" && input.files.length === 0)
       valid = false;
-    }
-
   });
 
-  // CHECK CHECKBOXES (STEP 6)
-  if (currentStep === 5) {
-    const checks = steps[currentStep].querySelectorAll(
-      "input[type='checkbox']"
-    );
-    checks.forEach(c => {
-      if (!c.checked) valid = false;
-    });
-  }
-
-  if (!valid) {
-    alert("Please complete all required fields before proceeding.");
-  }
-
+  if (!valid) alert("Please complete all required fields.");
   return valid;
 }
 
-/* NEXT BUTTON */
 nextBtn.onclick = () => {
-
-  // Validate first
   if (!validateStep()) return;
 
   if (currentStep < steps.length - 1) {
     currentStep++;
     showStep(currentStep);
   } else {
-    // FINAL SUBMIT SUCCESS
-    modal.style.display = "flex";
+    agreementModal.style.display = "flex";
   }
-
 };
 
-/* BACK BUTTON */
 prevBtn.onclick = () => {
   currentStep--;
   showStep(currentStep);
 };
 
-function closeModal() {
-  modal.style.display = "none";
+function closeAgreement() {
+  agreementModal.style.display = "none";
+}
+
+function confirmSubmission() {
+
+  const agree1 = document.getElementById("agree1");
+  const agree2 = document.getElementById("agree2");
+
+  if (!agree1.checked || !agree2.checked) {
+    alert("You must agree to all terms before submitting.");
+    return;
+  }
+
+  agreementModal.style.display = "none";
+  modal.style.display = "flex";
+
+  // ✅ AUTO CLOSE AFTER 5 SECONDS
+  setTimeout(() => {
+    modal.style.display = "none";
+  }, 5000);
 }
 
 showStep(currentStep);

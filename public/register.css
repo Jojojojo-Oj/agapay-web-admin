@@ -152,23 +152,54 @@ body{
 .steps{
   display:flex;
   justify-content:space-between;
-  margin:40px 0;
+  position:relative;
+  margin:40px 0 50px;
+  z-index:1;   /* 🔽 LOWER THAN MODAL */
 }
 
+/* CENTER LINE */
+
+.steps::before{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:0;
+  right:0;
+  height:4px;
+  background:#e2e8f0;
+  transform:translateY(-50%);
+  z-index:0;
+  border-radius:4px;
+}
+
+/* STEP CIRCLE */
+
 .step{
+  position:relative;
+  z-index:1;
+
   width:44px;
   height:44px;
+
   border-radius:50%;
   background:#e2e8f0;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   font-weight:700;
+  color:#64748b;
+
+  transition:.25s;
 }
+
+/* ACTIVE STEP */
 
 .step.active{
   background:#012F48;
   color:white;
+  box-shadow:0 6px 14px rgba(0,0,0,.2);
 }
 
 
@@ -246,13 +277,11 @@ body{
   cursor:pointer;
 }
 
-
 /* BACK */
 
 #prevBtn{
   background:#e2e8f0;
 }
-
 
 /* NEXT */
 
@@ -267,22 +296,81 @@ body{
 }
 
 
-/* ===== MODAL ===== */
+/* ===== MODAL (FIXED — ALWAYS ON TOP) ===== */
 
 .modal{
   position:fixed;
   inset:0;
+
   background:rgba(0,0,0,.55);
+
   display:none;
   align-items:center;
   justify-content:center;
+
+  z-index:9999;      /* 🔥 KEY FIX */
 }
 
 .modal-box{
   background:white;
   padding:36px;
   border-radius:18px;
-  text-align:center;
+  text-align:left;
+
+  max-width:520px;
+  width:90%;
+
+  position:relative;
+  z-index:10000;
+
+  box-shadow:0 25px 60px rgba(0,0,0,.25);
+}
+
+
+/* ===== MODAL BUTTONS ===== */
+
+.modal-actions{
+  margin-top:24px;
+  display:flex;
+  gap:12px;
+  justify-content:flex-end;
+}
+
+.btn-cancel{
+  padding:10px 20px;
+  background:#e2e8f0;
+  color:#0b2239;
+  border:none;
+  border-radius:8px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.btn-cancel:hover{
+  background:#cbd5e1;
+}
+
+.btn-submit{
+  padding:10px 22px;
+  background:#012F48;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+  box-shadow:0 4px 12px rgba(1,47,72,0.25);
+}
+
+.btn-submit:hover{
+  background:#014b72;
+  transform:translateY(-1px);
+  box-shadow:0 6px 18px rgba(1,47,72,0.35);
+}
+
+.btn-submit:active{
+  transform:scale(.98);
 }
 
 
@@ -306,66 +394,3 @@ body{
 @media(max-width:900px){
   .grid-2{ grid-template-columns:1fr; }
 }
-
-/* ===== STEPPER ===== */
-
-.steps{
-  display:flex;
-  justify-content:space-between;
-  position:relative;
-  margin:40px 0 50px;
-}
-
-/* CENTER LINE */
-
-.steps::before{
-  content:"";
-  position:absolute;
-  top:50%;
-  left:0;
-  right:0;
-  height:4px;
-  background:#e2e8f0;
-  transform:translateY(-50%);
-  z-index:0;
-  border-radius:4px;
-}
-
-/* STEP CIRCLE */
-
-.step{
-  position:relative;
-  z-index:1;
-
-  width:44px;
-  height:44px;
-
-  border-radius:50%;
-  background:#e2e8f0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-weight:700;
-  color:#64748b;
-
-  transition:.25s;
-}
-
-/* ACTIVE STEP */
-
-.step.active{
-  background:#012F48;
-  color:white;
-  box-shadow:0 6px 14px rgba(0,0,0,.2);
-}
-
-/* Force white text inside buttons */
-
-#nextBtn,
-.btn-primary,
-.modal-box button {
-  color: #ffffff !important;
-}
-
