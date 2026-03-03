@@ -40,7 +40,7 @@ export const subscribeToUsers = (callback) => {
 };
 
 export const subscribeToRescuerApplicants = (callback) => {
-  const rescuerRef = collection(db, "rescuer_applicants");
+  const rescuerRef = query(collection(db, "Users"), where("roles", "==", "rescuer"));
 
   const unsub = onSnapshot(rescuerRef, (snapshot) => {
     const data = snapshot.docs
@@ -134,10 +134,14 @@ export const filterRescuerApplicants = (
   statusFilter = "all"
 ) => {
   return applicants.filter((applicant) => {
+    const fallbackFullName = `${applicant.firstName || ""} ${applicant.lastName || ""}`.trim();
+
     const fullText = `
       ${applicant.organizationInformation?.organization_name || ""}
       ${applicant.leaderLeadRescuer?.full_name || ""}
       ${applicant.leaderLeadRescuer?.email_address || ""}
+      ${fallbackFullName}
+      ${applicant.email || ""}
     `.toLowerCase();
 
     const matchesSearch = fullText.includes(search.toLowerCase());

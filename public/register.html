@@ -206,6 +206,10 @@
   </div>
 </footer>
 
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+
 <script>
 let currentStep = 0;
 
@@ -215,6 +219,30 @@ const nextBtn = document.getElementById("nextBtn");
 const prevBtn = document.getElementById("prevBtn");
 const modal = document.getElementById("successModal");
 const agreementModal = document.getElementById("agreementModal");
+const submitAgreementBtn = document.querySelector(".btn-submit");
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAhwB5Fi4pQsERToK_2UrgHQ0ZHSAo0Zqs",
+  authDomain: "agapay-capstone.firebaseapp.com",
+  databaseURL: "https://agapay-capstone-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "agapay-capstone",
+  storageBucket: "agapay-capstone.firebasestorage.app",
+  messagingSenderId: "543856158845",
+  appId: "1:543856158845:web:beb6b1640837253341e914",
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+const stepSectionKeys = [
+  "organizationInformation",
+  "leaderLeadRescuer",
+  "volunteerTeamComposition",
+  "requiredDocuments",
+  "equipmentCapability",
+];
 
 function showStep(i) {
   steps.forEach(s => s.classList.remove("active"));
@@ -265,7 +293,86 @@ function closeAgreement() {
   agreementModal.style.display = "none";
 }
 
-function confirmSubmission() {
+function getFieldLabel(field) {
+  if (field.type === "file") {
+    const fileLabel = field.previousElementSibling;
+    if (fileLabel && fileLabel.tagName === "LABEL") return fileLabel.textContent.trim();
+  }
+
+  if (field.placeholder) return field.placeholder.replace("*", "").trim();
+
+  if (field.tagName === "SELECT") {
+    const firstOption = field.querySelector("option");
+    if (firstOption) return firstOption.textContent.replace("*", "").trim();
+  }
+
+  return "Field";
+}
+
+function getFieldKey(labelText) {
+  return labelText
+    .toLowerCase()
+    .replace(/\*/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function collectApplicationData() {
+  const collectedData = {};
+
+  for (let i = 0; i < stepSectionKeys.length; i++) {
+    const sectionKey = stepSectionKeys[i];
+    const sectionInputs = steps[i].querySelectorAll("input:not([type='file']), select");
+    const sectionData = {};
+
+    sectionInputs.forEach(input => {
+      const label = getFieldLabel(input);
+      const fieldKey = getFieldKey(label);
+      sectionData[fieldKey] = input.value.trim();
+    });
+
+    collectedData[sectionKey] = sectionData;
+  }
+
+  return collectedData;
+}
+
+async function uploadApplicationFiles(userId) {
+  const fileInputs = document.querySelectorAll(".form-step input[type='file']");
+  const uploadedFiles = {};
+
+  for (const input of fileInputs) {
+    const label = getFieldLabel(input);
+    const fieldKey = getFieldKey(label);
+
+    if (!input.files || input.files.length === 0) {
+      uploadedFiles[fieldKey] = [];
+      continue;
+    }
+
+    uploadedFiles[fieldKey] = [];
+
+    for (const file of input.files) {
+      const storagePath = `Users/${userId}/${fieldKey}/${Date.now()}_${file.name}`;
+      const fileRef = storage.ref(storagePath);
+
+      await fileRef.put(file);
+      const downloadURL = await fileRef.getDownloadURL();
+
+      uploadedFiles[fieldKey].push({
+        fileName: file.name,
+        fileType: file.type || "unknown",
+        fileSize: file.size,
+        storagePath,
+        downloadURL,
+      });
+    }
+  }
+
+  return uploadedFiles;
+}
+
+async function confirmSubmission() {
 
   const agree1 = document.getElementById("agree1");
   const agree2 = document.getElementById("agree2");
@@ -275,8 +382,63 @@ function confirmSubmission() {
     return;
   }
 
-  agreementModal.style.display = "none";
-  modal.style.display = "flex";
+  submitAgreementBtn.disabled = true;
+  submitAgreementBtn.textContent = "Submitting...";
+
+  try {
+    const applicationData = collectApplicationData();
+    const leadFullName = applicationData.leaderLeadRescuer?.full_name || "";
+    const nameParts = leadFullName.split(" ").filter(Boolean);
+    const firstName = nameParts.length ? nameParts[0] : "Rescuer";
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "Applicant";
+
+    const docRef = await db.collection("Users").add({
+      firstName,
+      lastName,
+      email:
+        applicationData.leaderLeadRescuer?.email_address ||
+        applicationData.organizationInformation?.official_email ||
+        "",
+      phoneNumber:
+        applicationData.leaderLeadRescuer?.contact_number ||
+        applicationData.organizationInformation?.official_contact_number ||
+        "",
+      roles: "rescuer",
+      status: "pending",
+      applicantType: "rescuer_organization",
+      organizationInformation: applicationData.organizationInformation,
+      leaderLeadRescuer: applicationData.leaderLeadRescuer,
+      volunteerTeamComposition: applicationData.volunteerTeamComposition,
+      requiredDocuments: applicationData.requiredDocuments,
+      equipmentCapability: applicationData.equipmentCapability,
+      agreements: {
+        followLguProtocols: agree1.checked,
+        dataPrivacyPolicy: agree2.checked,
+      },
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    const uploadedFiles = await uploadApplicationFiles(docRef.id);
+
+    await docRef.update({
+      uploadedFiles,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    agreementModal.style.display = "none";
+    modal.style.display = "flex";
+
+    document.getElementById("multiForm").reset();
+    currentStep = 0;
+    showStep(currentStep);
+  } catch (error) {
+    alert("Submission failed. Please try again.");
+    console.error("Failed to submit rescuer application:", error);
+  } finally {
+    submitAgreementBtn.disabled = false;
+    submitAgreementBtn.textContent = "Submit Application";
+  }
 
   // ✅ AUTO CLOSE AFTER 5 SECONDS
   setTimeout(() => {
