@@ -5,6 +5,12 @@
 import { db } from "./firebase";
 import { collection, onSnapshot, updateDoc, doc, query, where } from "firebase/firestore";
 
+const getTimeValue = (value) => {
+  if (!value) return 0;
+  if (typeof value.toDate === "function") return value.toDate().getTime();
+  return new Date(value).getTime() || 0;
+};
+
 /**
  * Fetch real-time users from Firestore with ascending order
  * @param {Function} callback - Called with sorted and formatted users
@@ -22,8 +28,30 @@ export const subscribeToUsers = (callback) => {
       }))
       .sort((a, b) => {
         // Sort by timestamp in ascending order (oldest first)
-        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        const timeA = getTimeValue(a.createdAt);
+        const timeB = getTimeValue(b.createdAt);
+        return timeA - timeB;
+      });
+
+    callback(data);
+  });
+
+  return unsub;
+};
+
+export const subscribeToRescuerApplicants = (callback) => {
+  const rescuerRef = collection(db, "rescuer_applicants");
+
+  const unsub = onSnapshot(rescuerRef, (snapshot) => {
+    const data = snapshot.docs
+      .map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+        status: docSnap.data().status || "pending",
+      }))
+      .sort((a, b) => {
+        const timeA = getTimeValue(a.createdAt);
+        const timeB = getTimeValue(b.createdAt);
         return timeA - timeB;
       });
 
@@ -95,6 +123,26 @@ export const filterUsers = (
     const matchesSearch = fullText.includes(search.toLowerCase());
     const matchesStatus =
       statusFilter === "all" || u.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+};
+
+export const filterRescuerApplicants = (
+  applicants,
+  search = "",
+  statusFilter = "all"
+) => {
+  return applicants.filter((applicant) => {
+    const fullText = `
+      ${applicant.organizationInformation?.organization_name || ""}
+      ${applicant.leaderLeadRescuer?.full_name || ""}
+      ${applicant.leaderLeadRescuer?.email_address || ""}
+    `.toLowerCase();
+
+    const matchesSearch = fullText.includes(search.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || applicant.status === statusFilter;
 
     return matchesSearch && matchesStatus;
   });

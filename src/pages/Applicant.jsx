@@ -2,17 +2,23 @@ import React, { useEffect, useState, useRef, useMemo } from "react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import "../styles/applicant.css";
+import "../styles/applicantRescuerPreview.css";
 
 import {
   subscribeToUsers,
+  subscribeToRescuerApplicants,
   updateUserStatus,
   filterUsers,
+  filterRescuerApplicants,
 } from "../services/applicantsService";
 import { sendAdminNotification } from "../services/notificationUtility";
 
 export default function Applicants() {
   const [users, setUsers] = useState([]);
+  const [rescuerApplicants, setRescuerApplicants] = useState([]);
   const [previewUser, setPreviewUser] = useState(null);
+  const [previewRescuer, setPreviewRescuer] = useState(null);
+  const [rescuerPreviewPage, setRescuerPreviewPage] = useState(1);
 
   // 🔍 Search & Filter
   const [search, setSearch] = useState("");
@@ -48,17 +54,20 @@ export default function Applicants() {
     return () => unsub();
   }, []);
 
-  /* ================= FILTER + SORT LOGIC ================= */
-  const filteredUsers = useMemo(() => {
-    // ✅ First: role separation
-    const roleFiltered = users.filter((u) => {
-      if (roleTab === "user") return u?.roles === "user";
-      if (roleTab === "rescuer") return u?.roles === "rescuer";
-      return true;
+  useEffect(() => {
+    const unsub = subscribeToRescuerApplicants((data) => {
+      setRescuerApplicants(data);
     });
 
-    // ✅ Then: existing filter logic
-    const results = filterUsers(roleFiltered, search, statusFilter);
+    return () => unsub();
+  }, []);
+
+  /* ================= FILTER + SORT LOGIC ================= */
+  const filteredApplicants = useMemo(() => {
+    const results =
+      roleTab === "rescuer"
+        ? filterRescuerApplicants(rescuerApplicants, search, statusFilter)
+        : filterUsers(users, search, statusFilter);
 
     // ✅ Sort: Pending first, then alphabetical
     const statusPriority = {
@@ -75,24 +84,34 @@ export default function Applicants() {
       if (prioA !== prioB) return prioA - prioB;
 
       // 2) Alphabetical by FULL NAME (safe kahit walang lastName)
-      const nameA = `${a.firstName || ""} ${a.lastName || ""}`
-        .trim()
-        .toLowerCase();
+      const nameA =
+        roleTab === "rescuer"
+          ? `${a.organizationInformation?.organization_name || ""}`
+              .trim()
+              .toLowerCase()
+          : `${a.firstName || ""} ${a.lastName || ""}`
+              .trim()
+              .toLowerCase();
 
-      const nameB = `${b.firstName || ""} ${b.lastName || ""}`
-        .trim()
-        .toLowerCase();
+      const nameB =
+        roleTab === "rescuer"
+          ? `${b.organizationInformation?.organization_name || ""}`
+              .trim()
+              .toLowerCase()
+          : `${b.firstName || ""} ${b.lastName || ""}`
+              .trim()
+              .toLowerCase();
 
       return nameA.localeCompare(nameB);
     });
-  }, [users, search, statusFilter, roleTab]);
+  }, [users, rescuerApplicants, search, statusFilter, roleTab]);
 
   /* ================= COUNTS FOR HEADER ================= */
   const counts = useMemo(() => {
-    const userApplicants = users.filter((u) => u?.roles === "user").length;
-    const rescuerApplicants = users.filter((u) => u?.roles === "rescuer").length;
-    return { userApplicants, rescuerApplicants };
-  }, [users]);
+    const userApplicants = users.length;
+    const rescuerApplicantsCount = rescuerApplicants.length;
+    return { userApplicants, rescuerApplicants: rescuerApplicantsCount };
+  }, [users, rescuerApplicants]);
 
   /* ================= ACTIONS ================= */
   const handleStatusChange = async (userId, newStatus) => {
@@ -124,6 +143,42 @@ export default function Applicants() {
       timer: 3000,
       showConfirmButton: false,
     });
+  };
+
+  const formatFieldLabel = (key = "") =>
+    key
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+
+  const renderInfoSection = (title, dataObj) => {
+    const entries = Object.entries(dataObj || {});
+
+    return (
+      <div className="rescuer-preview-section">
+        <p className="rescuer-preview-section-title">{title}</p>
+        {entries.length === 0 ? (
+          <p>—</p>
+        ) : (
+          entries.map(([key, value]) => (
+            <p key={key}>
+              <b>{formatFieldLabel(key)}:</b> {value || "—"}
+            </p>
+          ))
+        )}
+      </div>
+    );
+  };
+
+  const renderUploadedFiles = (files = []) => {
+    if (!files || files.length === 0) return <p>Not uploaded</p>;
+
+    return files.map((file, index) => (
+      <p key={`${file.fileName}-${index}`}>
+        <a href={file.downloadURL} target="_blank" rel="noreferrer">
+          {file.fileName || `Document ${index + 1}`}
+        </a>
+      </p>
+    ));
   };
 
   /* ================= UI ================= */
@@ -199,7 +254,7 @@ export default function Applicants() {
 
       {/* TABLE */}
       <div className="app-card">
-        {filteredUsers.length === 0 ? (
+        {filteredApplicants.length === 0 ? (
           <div className="app-empty">
             <div className="app-empty-title">No matching applicants</div>
             <div className="app-empty-subtitle">
@@ -210,66 +265,114 @@ export default function Applicants() {
           <div className="app-table-wrapper">
             <table className="app-table">
               <thead>
-                <tr>
-                  <th>Name</th>
-                  <th className="app-col-address">Address</th>
-                  <th>Preview</th>
-                  <th>Status</th>
-                  <th className="app-col-actions">Actions</th>
-                </tr>
+                {roleTab === "rescuer" ? (
+                  <tr>
+                    <th>Organization Name</th>
+                    <th>Team Leader</th>
+                    <th>Team Leader Email Address</th>
+                    <th>Preview</th>
+                    <th>Status</th>
+                    <th className="app-col-actions">Actions</th>
+                  </tr>
+                ) : (
+                  <tr>
+                    <th>Name</th>
+                    <th className="app-col-address">Address</th>
+                    <th>Preview</th>
+                    <th>Status</th>
+                    <th className="app-col-actions">Actions</th>
+                  </tr>
+                )}
               </thead>
 
               <tbody>
-                {filteredUsers.map((u) => (
-                  <tr key={u.id}>
-                    <td>
-                      <div className="app-name">
-                        <div className="app-name-main">
-                          {u.firstName} {u.lastName}
-                        </div>
-                        <div className="app-name-sub">
-                          {u.email || "—"} • {u.roles || "—"}
-                        </div>
-                      </div>
-                    </td>
+                {roleTab === "rescuer"
+                  ? filteredApplicants.map((u) => (
+                      <tr key={u.id}>
+                        <td>{u.organizationInformation?.organization_name || "—"}</td>
+                        <td>{u.leaderLeadRescuer?.full_name || "—"}</td>
+                        <td>{u.leaderLeadRescuer?.email_address || "—"}</td>
 
-                    <td className="app-address">{u.fullAddress || "—"}</td>
+                        <td>
+                          <button
+                            type="button"
+                            className="app-btn app-btn-outline"
+                            onClick={() => {
+                              setPreviewRescuer(u);
+                              setRescuerPreviewPage(1);
+                            }}
+                          >
+                            Preview
+                          </button>
+                        </td>
 
-                    <td>
-                      <button
-                        type="button"
-                        className="app-btn app-btn-outline"
-                        onClick={() => setPreviewUser(u)}
-                      >
-                        Preview
-                      </button>
-                    </td>
+                        <td>
+                          <span className={`app-badge app-badge-${u.status}`}>
+                            {u.status}
+                          </span>
+                        </td>
 
-                    <td>
-                      <span className={`app-badge app-badge-${u.status}`}>
-                        {u.status}
-                      </span>
-                    </td>
+                        <td className="app-actions">
+                          <button type="button" className="app-btn app-btn-success" disabled>
+                            Approve
+                          </button>
 
-                    <td className="app-actions">
-                      <button
-                        type="button"
-                        className="app-btn app-btn-success"
-                        onClick={() => handleStatusChange(u.id, "approved")}
-                      >
-                        Approve
-                      </button>
+                          <button type="button" className="app-btn app-btn-danger" disabled>
+                            Reject
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  : filteredApplicants.map((u) => (
+                      <tr key={u.id}>
+                        <td>
+                          <div className="app-name">
+                            <div className="app-name-main">
+                              {u.firstName} {u.lastName}
+                            </div>
+                            <div className="app-name-sub">
+                              {u.email || "—"} • {u.roles || "—"}
+                            </div>
+                          </div>
+                        </td>
 
-                      <button
-                        type="button"
-                        className="app-btn app-btn-danger"
-                        onClick={() => handleStatusChange(u.id, "rejected")}
-                      >
-                        Reject
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        <td className="app-address">{u.fullAddress || "—"}</td>
+
+                        <td>
+                          <button
+                            type="button"
+                            className="app-btn app-btn-outline"
+                            onClick={() => setPreviewUser(u)}
+                          >
+                            Preview
+                          </button>
+                        </td>
+
+                        <td>
+                          <span className={`app-badge app-badge-${u.status}`}>
+                            {u.status}
+                          </span>
+                        </td>
+
+                        <td className="app-actions">
+                          <button
+                            type="button"
+                            className="app-btn app-btn-success"
+                            onClick={() => handleStatusChange(u.id, "approved")}
+                          >
+                            Approve
+                          </button>
+
+                          <button
+                            type="button"
+                            className="app-btn app-btn-danger"
+                            onClick={() => handleStatusChange(u.id, "rejected")}
+                          >
+                            Reject
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
               </tbody>
             </table>
           </div>
@@ -373,6 +476,163 @@ export default function Applicants() {
                   onClick={() => handleStatusChange(previewUser.id, "rejected")}
                 >
                   Reject
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {previewRescuer && (
+        <div
+          className="app-overlay"
+          onClick={() => {
+            setPreviewRescuer(null);
+            setRescuerPreviewPage(1);
+          }}
+        >
+          <div className="app-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="app-modal-left rescuer-preview-full-width">
+              <div className="app-modal-header">
+                <div>
+                  <div className="app-modal-title">Rescuer Applicant Details</div>
+                  <div className="app-modal-subtitle">
+                    Page {rescuerPreviewPage} of 3 • {previewRescuer.status || "—"}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="app-btn app-btn-outline"
+                  onClick={() => {
+                    setPreviewRescuer(null);
+                    setRescuerPreviewPage(1);
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+
+              <div className="app-modal-body">
+                {rescuerPreviewPage === 1 &&
+                  renderInfoSection(
+                    "Organization Information",
+                    previewRescuer.organizationInformation
+                  )}
+
+                {rescuerPreviewPage === 2 && (
+                  <>
+                    {renderInfoSection(
+                      "Lead Rescuer Information",
+                      previewRescuer.leaderLeadRescuer
+                    )}
+                    {renderInfoSection(
+                      "Volunteer Team Composition",
+                      previewRescuer.volunteerTeamComposition
+                    )}
+                    {renderInfoSection(
+                      "Equipment and Capability",
+                      previewRescuer.equipmentCapability
+                    )}
+                  </>
+                )}
+
+                {rescuerPreviewPage === 3 && (
+                  <>
+                    <div className="rescuer-preview-section">
+                      <p className="rescuer-preview-section-title">
+                        Team Leader Government ID Upload
+                      </p>
+                      {renderUploadedFiles(
+                        previewRescuer.uploadedFiles?.government_id_upload || []
+                      )}
+                    </div>
+
+                    <div className="rescuer-preview-section">
+                      <p className="rescuer-preview-section-title">
+                        Required Documents Uploaded
+                      </p>
+                      <div className="rescuer-preview-document-block">
+                        <p>
+                          <b>Registration Certificate</b>
+                        </p>
+                        {renderUploadedFiles(
+                          previewRescuer.uploadedFiles?.registration_certificate || []
+                        )}
+                      </div>
+                      <div className="rescuer-preview-document-block">
+                        <p>
+                          <b>List of Members</b>
+                        </p>
+                        {renderUploadedFiles(
+                          previewRescuer.uploadedFiles?.list_of_members || []
+                        )}
+                      </div>
+                      <div className="rescuer-preview-document-block">
+                        <p>
+                          <b>Training Certificates</b>
+                        </p>
+                        {renderUploadedFiles(
+                          previewRescuer.uploadedFiles?.training_certificates || []
+                        )}
+                      </div>
+                      <div className="rescuer-preview-document-block">
+                        <p>
+                          <b>MOA with LGU</b>
+                        </p>
+                        {renderUploadedFiles(
+                          previewRescuer.uploadedFiles?.moa_with_lgu || []
+                        )}
+                      </div>
+                      <div className="rescuer-preview-document-block">
+                        <p>
+                          <b>Equipment Inventory</b>
+                        </p>
+                        {renderUploadedFiles(
+                          previewRescuer.uploadedFiles?.equipment_inventory || []
+                        )}
+                      </div>
+                      <div>
+                        <p>
+                          <b>Barangay Clearance</b>
+                        </p>
+                        {renderUploadedFiles(
+                          previewRescuer.uploadedFiles?.barangay_clearance || []
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <p>
+                  <b>Status:</b>{" "}
+                  <span className={`app-badge app-badge-${previewRescuer.status}`}>
+                    {previewRescuer.status}
+                  </span>
+                </p>
+              </div>
+
+              <div className="app-modal-footer">
+                <button
+                  type="button"
+                  className="app-btn app-btn-outline"
+                  onClick={() =>
+                    setRescuerPreviewPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={rescuerPreviewPage === 1}
+                >
+                  Previous
+                </button>
+
+                <button
+                  type="button"
+                  className="app-btn app-btn-outline"
+                  onClick={() =>
+                    setRescuerPreviewPage((prev) => Math.min(prev + 1, 3))
+                  }
+                  disabled={rescuerPreviewPage === 3}
+                >
+                  Next
                 </button>
               </div>
             </div>
