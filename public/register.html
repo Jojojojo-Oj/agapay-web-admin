@@ -16,7 +16,7 @@
       <a href="landing.html">
         <img src="logo.png" alt="AGAPAY">
       </a>
-      <span>AGAPAY</span>
+      <span>AGAPAY</span> 
     </div>
 
     <nav class="nav-links">
@@ -62,6 +62,7 @@
     <div class="step">4</div>
     <div class="step">5</div>
     <div class="step">6</div>
+    <div class="step">7</div>
   </div>
 
   <!-- STEP 1 -->
@@ -91,7 +92,8 @@
   <div class="form-step">
     <h3>Leader / Lead Rescuer</h3>
     <div class="grid-2">
-      <input type="text" placeholder="Full Name *">
+      <input type="text" placeholder="First Name *">
+      <input type="text" placeholder="Last Name *">
       <input type="text" placeholder="Position / Title">
       <input type="text" placeholder="Contact Number">
       <input type="email" placeholder="Email Address">
@@ -125,8 +127,8 @@
       <label>Training Certificates</label>
       <input type="file" accept=".jpg,.jpeg,.png,.pdf">
 
-      <label>MOA with LGU</label>
-      <input type="file" accept=".jpg,.jpeg,.png,.pdf">
+      <label>MOA with LGU (Optional)</label>
+      <input type="file" accept=".jpg,.jpeg,.png,.pdf" data-optional="true">
 
       <label>Equipment Inventory</label>
       <input type="file" accept=".jpg,.jpeg,.png,.pdf">
@@ -140,16 +142,50 @@
   <div class="form-step">
     <h3>Equipment & Capability</h3>
     <div class="grid-2">
-      <input type="text" placeholder="Rescue Vehicle">
-      <input type="text" placeholder="Rescue Boat">
-      <input type="text" placeholder="Rope Equipment">
-      <input type="text" placeholder="Medical Kits">
-      <input type="text" placeholder="Communication Equipment">
-      <input type="text" placeholder="GPS Tracker">
+      <select>
+        <option value="" selected disabled>Rescue Vehicle *</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      <select>
+        <option value="" selected disabled>Rescue Boat *</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      <select>
+        <option value="" selected disabled>Rope Equipment *</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      <select>
+        <option value="" selected disabled>Medical Kits *</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      <select>
+        <option value="" selected disabled>Communication Equipment *</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      <select>
+        <option value="" selected disabled>GPS Tracker *</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
     </div>
   </div>
 
   <!-- STEP 6 -->
+  <div class="form-step">
+    <h3>Account Creation</h3>
+    <div class="stack-1">
+      <input type="email" placeholder="Email Address *">
+      <input type="password" placeholder="Password *">
+      <input type="password" placeholder="Confirm Password *">
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
   <div class="form-step">
     <h3>Review & Submit</h3>
     <p>Please review your application before submission.</p>
@@ -209,6 +245,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 
 <script>
 let currentStep = 0;
@@ -235,6 +272,7 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
 const storage = firebase.storage();
+const auth = firebase.auth();
 
 const stepSectionKeys = [
   "organizationInformation",
@@ -242,6 +280,7 @@ const stepSectionKeys = [
   "volunteerTeamComposition",
   "requiredDocuments",
   "equipmentCapability",
+  "accountCreation",
 ];
 
 function showStep(i) {
@@ -257,6 +296,10 @@ function showStep(i) {
     : "Next";
 }
 
+function isStrongPassword(password) {
+  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/.test(password);
+}
+
 function validateStep() {
   const inputs = steps[currentStep].querySelectorAll("input, select");
   let valid = true;
@@ -265,9 +308,25 @@ function validateStep() {
     if (input.type !== "file" && input.value.trim() === "")
       valid = false;
 
-    if (input.type === "file" && input.files.length === 0)
+    if (input.type === "file" && !input.dataset.optional && input.files.length === 0)
       valid = false;
   });
+
+  if (currentStep === 5) {
+    const passwordInputs = steps[currentStep].querySelectorAll("input[type='password']");
+    const password = passwordInputs[0]?.value || "";
+    const confirmPassword = passwordInputs[1]?.value || "";
+
+    if (!isStrongPassword(password)) {
+      alert("Password must be at least 8 characters and include uppercase, lowercase, number, and special character.");
+      return false;
+    }
+
+    if (password !== confirmPassword) {
+      alert("Password and Confirm Password do not match.");
+      return false;
+    }
+  }
 
   if (!valid) alert("Please complete all required fields.");
   return valid;
@@ -387,18 +446,36 @@ async function confirmSubmission() {
 
   try {
     const applicationData = collectApplicationData();
-    const leadFullName = applicationData.leaderLeadRescuer?.full_name || "";
-    const nameParts = leadFullName.split(" ").filter(Boolean);
-    const firstName = nameParts.length ? nameParts[0] : "Rescuer";
-    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "Applicant";
+    const firstName = applicationData.leaderLeadRescuer?.first_name || "Rescuer";
+    const lastName = applicationData.leaderLeadRescuer?.last_name || "Applicant";
+    const accountEmail = applicationData.accountCreation?.email_address || "";
+    const accountPassword = applicationData.accountCreation?.password || "";
+    const confirmPassword = applicationData.accountCreation?.confirm_password || "";
 
-    const docRef = await db.collection("Users").add({
+    if (!accountEmail || !accountPassword || !confirmPassword) {
+      alert("Account Creation details are required.");
+      return;
+    }
+
+    if (!isStrongPassword(accountPassword)) {
+      alert("Password must be at least 8 characters and include uppercase, lowercase, number, and special character.");
+      return;
+    }
+
+    if (accountPassword !== confirmPassword) {
+      alert("Password and Confirm Password do not match.");
+      return;
+    }
+
+    const userCredential = await auth.createUserWithEmailAndPassword(accountEmail, accountPassword);
+    const userId = userCredential.user.uid;
+
+    const docRef = db.collection("Users").doc(userId);
+
+    await docRef.set({
       firstName,
       lastName,
-      email:
-        applicationData.leaderLeadRescuer?.email_address ||
-        applicationData.organizationInformation?.official_email ||
-        "",
+      email: accountEmail,
       phoneNumber:
         applicationData.leaderLeadRescuer?.contact_number ||
         applicationData.organizationInformation?.official_contact_number ||
@@ -411,6 +488,9 @@ async function confirmSubmission() {
       volunteerTeamComposition: applicationData.volunteerTeamComposition,
       requiredDocuments: applicationData.requiredDocuments,
       equipmentCapability: applicationData.equipmentCapability,
+      accountCreation: {
+        emailAddress: accountEmail,
+      },
       agreements: {
         followLguProtocols: agree1.checked,
         dataPrivacyPolicy: agree2.checked,
@@ -419,7 +499,7 @@ async function confirmSubmission() {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     });
 
-    const uploadedFiles = await uploadApplicationFiles(docRef.id);
+    const uploadedFiles = await uploadApplicationFiles(userId);
 
     await docRef.update({
       uploadedFiles,
@@ -433,7 +513,11 @@ async function confirmSubmission() {
     currentStep = 0;
     showStep(currentStep);
   } catch (error) {
-    alert("Submission failed. Please try again.");
+    if (error.code === "auth/email-already-in-use") {
+      alert("This email is already registered. Please use another email.");
+    } else {
+      alert("Submission failed. Please try again.");
+    }
     console.error("Failed to submit rescuer application:", error);
   } finally {
     submitAgreementBtn.disabled = false;

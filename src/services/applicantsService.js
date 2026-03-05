@@ -134,10 +134,14 @@ export const filterRescuerApplicants = (
   statusFilter = "all"
 ) => {
   return applicants.filter((applicant) => {
+    const leaderFirstName = applicant.leaderLeadRescuer?.first_name || "";
+    const leaderLastName = applicant.leaderLeadRescuer?.last_name || "";
+    const leaderFullName = `${leaderFirstName} ${leaderLastName}`.trim();
     const fallbackFullName = `${applicant.firstName || ""} ${applicant.lastName || ""}`.trim();
 
     const fullText = `
       ${applicant.organizationInformation?.organization_name || ""}
+      ${leaderFullName}
       ${applicant.leaderLeadRescuer?.full_name || ""}
       ${applicant.leaderLeadRescuer?.email_address || ""}
       ${fallbackFullName}

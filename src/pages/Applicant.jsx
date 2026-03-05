@@ -115,9 +115,11 @@ export default function Applicants() {
 
   /* ================= ACTIONS ================= */
   const handleStatusChange = async (userId, newStatus) => {
+    const applicantLabel = roleTab === "rescuer" ? "rescuer applicant" : "user";
+
     const result = await Swal.fire({
-      title: `${newStatus.toUpperCase()} USER`,
-      text: `Are you sure you want to ${newStatus} this user?`,
+      title: `${newStatus.toUpperCase()} ${applicantLabel.toUpperCase()}`,
+      text: `Are you sure you want to ${newStatus} this ${applicantLabel}?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: newStatus === "approved" ? "#16a34a" : "#dc2626",
@@ -127,11 +129,18 @@ export default function Applicants() {
     if (result.isConfirmed) {
       try {
         await updateUserStatus(userId, newStatus);
-        Swal.fire("Success", "User status updated", "success");
+        Swal.fire("Success", "Applicant status updated", "success");
       } catch (err) {
-        Swal.fire("Error", "Failed to update user status", "error");
+        Swal.fire("Error", "Failed to update applicant status", "error");
       }
     }
+  };
+
+  const getTeamLeaderName = (rescuerApplicant) => {
+    const firstName = rescuerApplicant?.leaderLeadRescuer?.first_name || "";
+    const lastName = rescuerApplicant?.leaderLeadRescuer?.last_name || "";
+    const combinedName = `${firstName} ${lastName}`.trim();
+    return combinedName || rescuerApplicant?.leaderLeadRescuer?.full_name || "—";
   };
 
   const showToast = (name) => {
@@ -290,7 +299,7 @@ export default function Applicants() {
                   ? filteredApplicants.map((u) => (
                       <tr key={u.id}>
                         <td>{u.organizationInformation?.organization_name || "—"}</td>
-                        <td>{u.leaderLeadRescuer?.full_name || "—"}</td>
+                        <td>{getTeamLeaderName(u)}</td>
                         <td>{u.leaderLeadRescuer?.email_address || "—"}</td>
 
                         <td>
@@ -313,11 +322,21 @@ export default function Applicants() {
                         </td>
 
                         <td className="app-actions">
-                          <button type="button" className="app-btn app-btn-success" disabled>
+                          <button
+                            type="button"
+                            className="app-btn app-btn-success"
+                            onClick={() => handleStatusChange(u.id, "approved")}
+                            disabled={u.status === "approved"}
+                          >
                             Approve
                           </button>
 
-                          <button type="button" className="app-btn app-btn-danger" disabled>
+                          <button
+                            type="button"
+                            className="app-btn app-btn-danger"
+                            onClick={() => handleStatusChange(u.id, "rejected")}
+                            disabled={u.status === "rejected"}
+                          >
                             Reject
                           </button>
                         </td>
@@ -359,6 +378,7 @@ export default function Applicants() {
                             type="button"
                             className="app-btn app-btn-success"
                             onClick={() => handleStatusChange(u.id, "approved")}
+                            disabled={u.status === "approved"}
                           >
                             Approve
                           </button>
@@ -367,6 +387,7 @@ export default function Applicants() {
                             type="button"
                             className="app-btn app-btn-danger"
                             onClick={() => handleStatusChange(u.id, "rejected")}
+                            disabled={u.status === "rejected"}
                           >
                             Reject
                           </button>
@@ -466,6 +487,7 @@ export default function Applicants() {
                   type="button"
                   className="app-btn app-btn-success"
                   onClick={() => handleStatusChange(previewUser.id, "approved")}
+                  disabled={previewUser.status === "approved"}
                 >
                   Approve
                 </button>
@@ -474,6 +496,7 @@ export default function Applicants() {
                   type="button"
                   className="app-btn app-btn-danger"
                   onClick={() => handleStatusChange(previewUser.id, "rejected")}
+                  disabled={previewUser.status === "rejected"}
                 >
                   Reject
                 </button>
@@ -613,6 +636,24 @@ export default function Applicants() {
               </div>
 
               <div className="app-modal-footer">
+                <button
+                  type="button"
+                  className="app-btn app-btn-success"
+                  onClick={() => handleStatusChange(previewRescuer.id, "approved")}
+                  disabled={previewRescuer.status === "approved"}
+                >
+                  Approve
+                </button>
+
+                <button
+                  type="button"
+                  className="app-btn app-btn-danger"
+                  onClick={() => handleStatusChange(previewRescuer.id, "rejected")}
+                  disabled={previewRescuer.status === "rejected"}
+                >
+                  Reject
+                </button>
+
                 <button
                   type="button"
                   className="app-btn app-btn-outline"

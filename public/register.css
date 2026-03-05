@@ -221,11 +221,19 @@ body{
   gap:20px;
 }
 
+.stack-1{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:20px;
+}
+
 
 /* ===== INPUT STYLE ===== */
 
 .grid-2 input,
-.grid-2 select{
+.grid-2 select,
+.stack-1 input,
+.stack-1 select{
   padding:14px 16px;
   border-radius:12px;
   border:1px solid #d6e0ea;
@@ -236,7 +244,9 @@ body{
 }
 
 .grid-2 input:focus,
-.grid-2 select:focus{
+.grid-2 select:focus,
+.stack-1 input:focus,
+.stack-1 select:focus{
   border-color:#012F48;
   box-shadow:0 0 0 3px rgba(1,47,72,.12);
   outline:none;
