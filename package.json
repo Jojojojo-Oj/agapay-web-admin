@@ -17,6 +17,7 @@
     "react-scripts": "^5.0.1",
     "sweetalert2": "^11.26.20"
   },
+  "proxy": "http://localhost:3001",
   "browserslist": {
     "production": [
       ">0.2%",

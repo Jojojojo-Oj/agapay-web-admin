@@ -13,6 +13,7 @@ import CreateAnnouncement from "./pages/Announcement";
 import Incidents from "./pages/Incidents";
 import CreateRescuerAccount from "./pages/CreateRescuer";
 import ResolvedCases from "./pages/ResolvedCases";
+import AlertPage from "./pages/Alert";
 
 function App() {
   const [page, setPage] = useState("dashboard");
@@ -75,6 +76,7 @@ function App() {
             {page === "incidents" && "Incidents"}
             {page === "resolvedCases" && "Resolved Cases"}
             {page === "rescuer" && "Create Rescuer"}
+            {page === "alert" && "Alert"}
           </h3>
         </div>
 
@@ -87,6 +89,7 @@ function App() {
           {page === "incidents" && <Incidents />}
           {page === "resolvedCases" && <ResolvedCases />}
           {page === "rescuer" && <CreateRescuerAccount />}
+          {page === "alert" && <AlertPage />}
         </div>
       </div>
     </div>

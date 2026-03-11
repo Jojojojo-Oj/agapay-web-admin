@@ -18,6 +18,61 @@ import {
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import axios from "axios";
 
+const normalizeEmergencyType = (value) =>
+  String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const extractIncidentEmergencyType = (reportData) => {
+  if (!reportData) return "";
+
+  return normalizeEmergencyType(
+    reportData.disasterType ||
+      reportData.emergencyType ||
+      reportData.incidentType ||
+      reportData.type ||
+      reportData.sosType ||
+      reportData.category ||
+      ""
+  );
+};
+
+const extractRescuerAvailabilities = (userData) => {
+  const fromRoot = userData?.emergency_availability;
+  const fromEquipment = userData?.equipmentCapability?.emergency_availability;
+  const raw = fromRoot ?? fromEquipment ?? [];
+
+  if (Array.isArray(raw)) return raw.map(normalizeEmergencyType).filter(Boolean);
+  if (typeof raw === "string") return [normalizeEmergencyType(raw)].filter(Boolean);
+  return [];
+};
+
+const emergencyTypeMatches = (incidentType, availability) => {
+  if (!incidentType || !availability) return false;
+  if (incidentType === availability) return true;
+  if (incidentType.includes(availability) || availability.includes(incidentType)) {
+    return true;
+  }
+
+  const aliases = [
+    ["medical", "medical assistance", "health", "ambulance"],
+    ["typhoon", "storm", "flood"],
+    ["fire", "sunog"],
+    ["earthquake", "quake", "lindol"],
+    ["landslide", "mudslide"],
+    ["tsunami"],
+    ["volcano", "volcanic", "eruption"],
+  ];
+
+  return aliases.some((group) => {
+    const incidentInGroup = group.some((k) => incidentType.includes(k));
+    const availInGroup = group.some((k) => availability.includes(k));
+    return incidentInGroup && availInGroup;
+  });
+};
+
 /**
  * Fetch real-time SOS reports from Firestore
  * @param {Function} callback - Called with sorted and formatted reports
@@ -79,31 +134,32 @@ export const updateIncidentStatus = async (reportId, newStatus) => {
     // If publishing (making active), notify rescuers via FCM tokens
     if (newStatus === "active") {
       try {
+        const reportSnap = await getDoc(reportRef);
+        const reportData = reportSnap.exists() ? reportSnap.data() : null;
+        const incidentEmergencyType = extractIncidentEmergencyType(reportData);
+
         const tokenSet = new Set();
 
-        // Collect tokens from Users where roles == 'rescuer'
+        // Collect tokens from rescuers whose emergency availability matches this incident
         const q = query(
           collection(db, "Users"),
           where("roles", "==", "rescuer")
         );
+
         const usersSnap = await getDocs(q);
         usersSnap.forEach((d) => {
           const data = d.data() || {};
+
+          const availabilities = extractRescuerAvailabilities(data);
+          const hasMatch = incidentEmergencyType
+            ? availabilities.some((a) => emergencyTypeMatches(incidentEmergencyType, a))
+            : false;
+
+          if (!hasMatch) return;
+
           if (data.fcmToken) tokenSet.add(data.fcmToken);
           if (data.token) tokenSet.add(data.token);
         });
-
-        // Also check global fcmTokens collection if present
-        try {
-          const tokensSnap = await getDocs(collection(db, "fcmTokens"));
-          tokensSnap.forEach((d) => {
-            const data = d.data() || {};
-            if (data.token) tokenSet.add(data.token);
-            if (data.fcmToken) tokenSet.add(data.fcmToken);
-          });
-        } catch (e) {
-          // optional collection may not exist
-        }
 
         const fcmTokens = Array.from(tokenSet).filter(Boolean);
         if (fcmTokens.length > 0) {
@@ -124,7 +180,11 @@ export const updateIncidentStatus = async (reportId, newStatus) => {
 
           await Promise.allSettled(notificationPromises);
           console.log(
-            `Notifications attempted for ${fcmTokens.length} rescuer token(s)`
+            `Notifications attempted for ${fcmTokens.length} matched rescuer token(s)`
+          );
+        } else {
+          console.log(
+            `No matching rescuer tokens found for incident type: ${incidentEmergencyType || "unknown"}`
           );
         }
       } catch (notifyErr) {

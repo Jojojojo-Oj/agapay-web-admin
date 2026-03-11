@@ -167,11 +167,18 @@
         <option value="Yes">Yes</option>
         <option value="No">No</option>
       </select>
-      <select>
-        <option value="" selected disabled>GPS Tracker *</option>
-        <option value="Yes">Yes</option>
-        <option value="No">No</option>
-      </select>
+
+      <div class="checkbox-group full-width">
+        <p>Emergency Availability *</p>
+        <label><input type="checkbox" name="emergency_availability" value="Typhoon"> Typhoon</label>
+        <label><input type="checkbox" name="emergency_availability" value="Fire"> Fire</label>
+        <label><input type="checkbox" name="emergency_availability" value="Earthquake"> Earthquake</label>
+        <label><input type="checkbox" name="emergency_availability" value="Medical Assistance"> Medical Assistance</label>
+        <label><input type="checkbox" name="emergency_availability" value="Landslide"> Landslide</label>
+        <label><input type="checkbox" name="emergency_availability" value="Police"> Police</label>
+        <label><input type="checkbox" name="emergency_availability" value="Volcano"> Volcano</label>
+        <label><input type="checkbox" name="emergency_availability" value="Tsunami"> Tsunami</label>
+      </div>
     </div>
   </div>
 
@@ -305,12 +312,23 @@ function validateStep() {
   let valid = true;
 
   inputs.forEach(input => {
+    if (input.type === "checkbox") return;
+
     if (input.type !== "file" && input.value.trim() === "")
       valid = false;
 
     if (input.type === "file" && !input.dataset.optional && input.files.length === 0)
       valid = false;
   });
+
+  if (currentStep === 4) {
+    const emergencyOptions = steps[currentStep].querySelectorAll("input[name='emergency_availability']");
+    const hasEmergencySelection = Array.from(emergencyOptions).some(option => option.checked);
+    if (!hasEmergencySelection) {
+      alert("Please select at least one Emergency Availability option.");
+      return false;
+    }
+  }
 
   if (currentStep === 5) {
     const passwordInputs = steps[currentStep].querySelectorAll("input[type='password']");
@@ -385,10 +403,19 @@ function collectApplicationData() {
     const sectionData = {};
 
     sectionInputs.forEach(input => {
+      if (input.type === "checkbox") return;
+
       const label = getFieldLabel(input);
       const fieldKey = getFieldKey(label);
       sectionData[fieldKey] = input.value.trim();
     });
+
+    if (i === 4) {
+      const emergencyOptions = steps[i].querySelectorAll("input[name='emergency_availability']");
+      sectionData.emergency_availability = Array.from(emergencyOptions)
+        .filter(option => option.checked)
+        .map(option => option.value);
+    }
 
     collectedData[sectionKey] = sectionData;
   }

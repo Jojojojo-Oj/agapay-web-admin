@@ -262,6 +262,32 @@ body{
   cursor:pointer;
 }
 
+.grid-2 .checkbox-group{
+  grid-column:1 / -1;
+  border:1px solid #d6e0ea;
+  border-radius:12px;
+  padding:14px 16px;
+  background:#fff;
+}
+
+.grid-2 .checkbox-group p{
+  margin:0 0 10px;
+  font-weight:600;
+  color:#012F48;
+}
+
+.grid-2 .checkbox-group label{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin:6px 14px 6px 0;
+  font-size:14px;
+}
+
+.grid-2 .checkbox-group input[type="checkbox"]{
+  width:auto;
+}
+
 
 /* ===== CHECKBOX ===== */
 

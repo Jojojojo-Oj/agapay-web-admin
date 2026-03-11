@@ -48,6 +48,14 @@ const Sidebar = ({ setPage }) => {
         </li>
 
         <li
+          className={activeItem === "alert" ? "active" : ""}
+          onClick={() => handleClick("alert")}
+        >
+          Alert
+        </li>
+
+
+        <li
           className={activeItem === "incidents" ? "active" : ""}
           onClick={() => handleClick("incidents")}
         >
@@ -61,19 +69,8 @@ const Sidebar = ({ setPage }) => {
           Resolved Cases
         </li>
 
-        <li
-          className={activeItem === "rescuer" ? "active" : ""}
-          onClick={() => handleClick("rescuer")}
-        >
-          Create Rescuer
-        </li>
+        
 
-        <li
-          className={activeItem === "users" ? "active" : ""}
-          onClick={() => handleClick("users")}
-        >
-          Users
-        </li>
 
         {/* LOGOUT */}
         <li 
