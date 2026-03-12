@@ -78,8 +78,8 @@ body{
 /* CONTACT BUTTON */
 
 .btn-primary{
-  background:#021a32;
-  color:#fff;
+   background: #012F48;
+  color: #ffffff !important;
   padding:0 26px;
   height:44px;
   border-radius:14px;
@@ -88,11 +88,9 @@ body{
   justify-content:center;
 }
 
-.btn-primary:hover{
-  background:#dc2626;
+.btn-primary:hover {
+  background: #dc2626;
 }
-
-
 /* ===== TOP BAR ===== */
 
 .reg-topbar{

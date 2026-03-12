@@ -4,6 +4,7 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import "../styles/applicant.css";
 import "../styles/applicantRescuerPreview.css";
 
+
 import {
   subscribeToUsers,
   subscribeToRescuerApplicants,
@@ -18,6 +19,7 @@ export default function Applicants() {
   const [rescuerApplicants, setRescuerApplicants] = useState([]);
   const [previewUser, setPreviewUser] = useState(null);
   const [previewRescuer, setPreviewRescuer] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   const [rescuerPreviewPage, setRescuerPreviewPage] = useState(1);
 
   // 🔍 Search & Filter
@@ -166,29 +168,87 @@ export default function Applicants() {
       <div className="rescuer-preview-section">
         <p className="rescuer-preview-section-title">{title}</p>
         {entries.length === 0 ? (
-          <p>—</p>
-        ) : (
-          entries.map(([key, value]) => (
-            <p key={key}>
-              <b>{formatFieldLabel(key)}:</b> {value || "—"}
-            </p>
-          ))
-        )}
+  <p>—</p>
+) : (
+  entries.map(([key, value]) => {
+
+    if (key === "emergency_availability" && value) {
+
+  const icons = {
+    fire: "/icon_fire.png",
+    typhoon: "/icon_typhoon.png",
+    earthquake: "/icon_earthquake.png",
+  };
+
+  // normalize value to array
+  const list = Array.isArray(value)
+    ? value
+    : value
+        .toString()
+        .replace(/,/g, " ")
+        .split(/\s+/)
+        .filter(Boolean);
+
+  return (
+    <p key={key}>
+      <b>{formatFieldLabel(key)}:</b>{" "}
+      {list.map((item, i) => {
+        const clean = item.trim().toLowerCase();
+
+        return (
+          <span key={i} className="emergency-tag">
+            {icons[clean] && (
+              <img
+                src={icons[clean]}
+                className="emergency-icon"
+                alt={item}
+              />
+            )}
+            {item}
+          </span>
+        );
+      })}
+    </p>
+  );
+}
+
+    return (
+      <p key={key}>
+        <b>{formatFieldLabel(key)}:</b> {value || "—"}
+      </p>
+    );
+
+  })
+)}
       </div>
     );
   };
 
   const renderUploadedFiles = (files = []) => {
-    if (!files || files.length === 0) return <p>Not uploaded</p>;
+  if (!files || files.length === 0) return <p>Not uploaded</p>;
 
-    return files.map((file, index) => (
-      <p key={`${file.fileName}-${index}`}>
-        <a href={file.downloadURL} target="_blank" rel="noreferrer">
-          {file.fileName || `Document ${index + 1}`}
-        </a>
-      </p>
-    ));
-  };
+  return (
+    <div className="rescuer-document-grid">
+      {files.map((file, index) => (
+        <div
+          key={`${file.fileName}-${index}`}
+          className="rescuer-document-card"
+        >
+          <img
+            src={file.downloadURL}
+            alt={file.fileName || `Document ${index + 1}`}
+            className="rescuer-document-image"
+            style={{ cursor: "zoom-in" }}
+            onClick={() => setPreviewImage(file.downloadURL)}
+            onError={(e) => (e.target.style.display = "none")}
+          />
+
+
+        </div>
+      ))}
+    </div>
+  );
+};
 
   /* ================= UI ================= */
   return (
@@ -523,6 +583,30 @@ export default function Applicants() {
                     Page {rescuerPreviewPage} of 3 • {previewRescuer.status || "—"}
                   </div>
                 </div>
+                {previewImage && (
+  <div
+    className="image-modal-overlay"
+    onClick={() => setPreviewImage(null)}
+  >
+    <div
+      className="image-modal-content"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        className="image-modal-close"
+        onClick={() => setPreviewImage(null)}
+      >
+        ✕
+      </button>
+
+      <img
+        src={previewImage}
+        alt="Document Preview"
+        className="image-modal-image"
+      />
+    </div>
+  </div>
+)}
 
                 <button
                   type="button"
