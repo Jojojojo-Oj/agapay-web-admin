@@ -44,22 +44,40 @@
 
 .inc-notification-stack {
   position: fixed;
-
-  top: 24px;
-  right: 24px;                 /* 👈 hindi dikit */
+  inset: 0;
 
   display: flex;
-  flex-direction: column;
-  gap: 18px;
-
-  max-height: calc(100vh - 48px); /* 👈 may margin top/bottom */
-  overflow-y: auto;
+  justify-content: center;
+  align-items: center;
 
   z-index: 9999;
   pointer-events: none;
-
-  padding-right: 6px;          /* 👈 extra breathing space */
 }
+
+.inc-notification-item {
+  position: absolute;
+  left: 0;
+  right: 0;
+ margin: auto;
+
+  width: min(92vw, 520px);
+  pointer-events: auto;
+
+  background: linear-gradient(135deg,#ff2e2e,#b30000);
+  color: white;
+
+  border-radius: 18px;
+  padding: 22px 26px;
+
+  border-left: 7px solid #fff;
+
+  box-shadow:
+    0 14px 36px rgba(0,0,0,0.55),
+    0 0 35px rgba(255,0,0,0.75);
+
+  transition: transform 0.3s ease;
+}
+
 
 /* ================= LARGE ALERT CARD ================= */
 
@@ -108,6 +126,28 @@
       0 14px 36px rgba(0, 0, 0, 0.7),
       0 0 48px rgba(255, 0, 0, 1);
   }
+}
+.inc-notification-item:nth-child(1) {
+  transform: translateY(0) scale(1);
+  z-index: 5;
+}
+
+.inc-notification-item:nth-child(2) {
+  transform: translateY(12px) scale(0.97);
+  z-index: 4;
+  opacity: 0.95;
+}
+
+.inc-notification-item:nth-child(3) {
+  transform: translateY(24px) scale(0.94);
+  z-index: 3;
+  opacity: 0.9;
+}
+
+.inc-notification-item:nth-child(4) {
+  transform: translateY(36px) scale(0.91);
+  z-index: 2;
+  opacity: 0.85;
 }
 
 /* ================= HEADER ================= */

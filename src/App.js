@@ -15,6 +15,8 @@ import CreateRescuerAccount from "./pages/CreateRescuer";
 import ResolvedCases from "./pages/ResolvedCases";
 import AlertPage from "./pages/Alert";
 
+import GlobalIncidentNotifications from "./components/GlobalIncidentNotifications";
+
 function App() {
   const [page, setPage] = useState("dashboard");
 
@@ -62,6 +64,10 @@ function App() {
   }, []);
 
   return (
+  <>
+    {/* GLOBAL NOTIFICATIONS */}
+    <GlobalIncidentNotifications />
+
     <div className="dashboard-layout">
       <Sidebar setPage={setPage} activePage={page} />
 
@@ -93,7 +99,8 @@ function App() {
         </div>
       </div>
     </div>
-  );
+  </>
+);
 }
 
 export default App;
