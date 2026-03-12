@@ -3,6 +3,14 @@ import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import "../styles/applicant.css";
 import "../styles/applicantRescuerPreview.css";
+import earthquakeIcon from "../assets/icons/eqeq.png";
+import fireIcon from "../assets/icons/firefire.png";
+import landslideIcon from "../assets/icons/lsls.png";
+import medicalIcon from "../assets/icons/medmed.png";
+import policeIcon from "../assets/icons/popo.png";
+import tsunamiIcon from "../assets/icons/tsutsu.png";
+import typhoonIcon from "../assets/icons/typtyp.png";
+import volcanoIcon from "../assets/icons/vulvul.png";
 
 
 import {
@@ -161,6 +169,14 @@ export default function Applicants() {
       .replace(/_/g, " ")
       .replace(/\b\w/g, (char) => char.toUpperCase());
 
+  const normalizeAvailabilityItem = (item = "") =>
+    item
+      .toString()
+      .trim()
+      .toLowerCase()
+      .replace(/[_-]+/g, " ")
+      .replace(/\s+/g, " ");
+
   const renderInfoSection = (title, dataObj) => {
     const entries = Object.entries(dataObj || {});
 
@@ -175,25 +191,53 @@ export default function Applicants() {
     if (key === "emergency_availability" && value) {
 
   const icons = {
-    fire: "/icon_fire.png",
-    typhoon: "/icon_typhoon.png",
-    earthquake: "/icon_earthquake.png",
+    earthquake: earthquakeIcon,
+    fire: fireIcon,
+    landslide: landslideIcon,
+    medical: medicalIcon,
+    "medical assistance": medicalIcon,
+    police: policeIcon,
+    "police assistance": policeIcon,
+    tsunami: tsunamiIcon,
+    typhoon: typhoonIcon,
+    volcano: volcanoIcon,
+    volcan: volcanoIcon,
   };
+
+  const availabilityLabels = [
+    "earthquake",
+    "fire",
+    "landslide",
+    "medical assistance",
+    "medical",
+    "police assistance",
+    "police",
+    "tsunami",
+    "typhoon",
+    "volcano",
+    "volcan",
+  ];
 
   // normalize value to array
   const list = Array.isArray(value)
     ? value
-    : value
-        .toString()
-        .replace(/,/g, " ")
-        .split(/\s+/)
-        .filter(Boolean);
+    : value.toString().includes(",")
+      ? value
+          .toString()
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean)
+      : availabilityLabels.filter((label) =>
+          normalizeAvailabilityItem(value).includes(label)
+        );
 
   return (
-    <p key={key}>
-      <b>{formatFieldLabel(key)}:</b>{" "}
-      {list.map((item, i) => {
-        const clean = item.trim().toLowerCase();
+    <div key={key} className="rescuer-preview-row rescuer-preview-row-emergency">
+      <b>{formatFieldLabel(key)}:</b>
+      <div className="emergency-tags-row">
+        {list.map((item, i) => {
+        const clean = normalizeAvailabilityItem(item);
+        const displayLabel = formatFieldLabel(clean);
 
         return (
           <span key={i} className="emergency-tag">
@@ -201,14 +245,15 @@ export default function Applicants() {
               <img
                 src={icons[clean]}
                 className="emergency-icon"
-                alt={item}
+                alt={displayLabel}
               />
             )}
-            {item}
+            {displayLabel}
           </span>
         );
       })}
-    </p>
+      </div>
+    </div>
   );
 }
 
@@ -543,23 +588,6 @@ export default function Applicants() {
               </div>
 
               <div className="app-modal-footer">
-                <button
-                  type="button"
-                  className="app-btn app-btn-success"
-                  onClick={() => handleStatusChange(previewUser.id, "approved")}
-                  disabled={previewUser.status === "approved"}
-                >
-                  Approve
-                </button>
-
-                <button
-                  type="button"
-                  className="app-btn app-btn-danger"
-                  onClick={() => handleStatusChange(previewUser.id, "rejected")}
-                  disabled={previewUser.status === "rejected"}
-                >
-                  Reject
-                </button>
               </div>
             </div>
           </div>
@@ -720,24 +748,6 @@ export default function Applicants() {
               </div>
 
               <div className="app-modal-footer">
-                <button
-                  type="button"
-                  className="app-btn app-btn-success"
-                  onClick={() => handleStatusChange(previewRescuer.id, "approved")}
-                  disabled={previewRescuer.status === "approved"}
-                >
-                  Approve
-                </button>
-
-                <button
-                  type="button"
-                  className="app-btn app-btn-danger"
-                  onClick={() => handleStatusChange(previewRescuer.id, "rejected")}
-                  disabled={previewRescuer.status === "rejected"}
-                >
-                  Reject
-                </button>
-
                 <button
                   type="button"
                   className="app-btn app-btn-outline"
