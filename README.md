@@ -1,70 +1,84 @@
-# Getting Started with Create React App
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/54a13722-f085-480b-9317-d2141616063a" /># 🌐 AGAPAY Web
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A web-based emergency response system built to complement the AGAPAY mobile app. It allows users and responders to monitor emergency reports, view real-time locations, and access essential disaster preparedness resources through a browser.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+##  Overview
 
-### `npm start`
+AGAPAY Web is designed to improve emergency coordination by providing a centralized dashboard for viewing SOS alerts, user locations, and safety information. It supports faster decision-making for responders and enhances accessibility through web platforms.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+##  Features
 
-### `npm test`
+-  Real-time SOS emergency reports dashboard  
+-  Live location tracking of emergency users  
+-  User and emergency data monitoring  
+-  Centralized web interface for responders/admins  
+-  Secure authentication system  
+-  SMS Integration 
+-  Manages Users and Rescuer Information
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🛠️ Tech Stack
 
-### `npm run build`
+- **Frontend:** HTML, CSS, JavaScript and React 
+- **Backend:** Firebase / Node.js 
+- **Database:** Firestore / Realtime Database  
+- **Maps:** Google Maps API 
+- **SMS:** Semaphore
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+##  Screenshots
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+###  Landing Page
 
-### `npm run eject`
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/538c9a04-60bf-4575-bd4a-4a52f05898b7" />
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Rescuer Registration
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/56b72944-3fed-42d9-952e-614f8fd02433" />
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Admin Dashboard
+(It shows live map that display live location of disasters and rescuers)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/8e0f76ce-02bc-4eca-8024-487adeca71ed" />
 
-### Code Splitting
+---
+### Applicants 
+(It manages user and rescuer application
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/0556d5ed-b1ea-43c1-8d87-819f344895a1" />
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Publish News and Publish Announcement
+( It publish news and send notification that appears in the user app)
 
-### Making a Progressive Web App
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/32f7d5a9-7219-46db-8d0c-9ecfe496da5e" />
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Alert
+(It manages SMS/Alerts messages that users will receive)
 
-### Advanced Configuration
+<img width="1913" height="1079" alt="image" src="https://github.com/user-attachments/assets/4a04a147-721b-4e7d-8f7d-81e8edc6d849" />
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Incidents
+(Manages Incidents)
 
-### Deployment
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/76d4c5bc-3805-421a-b6b8-1b388b140b7d" />
+<img width="1913" height="1079" alt="image" src="https://github.com/user-attachments/assets/796b6d92-dad8-45bb-9964-e53e1e246bad" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/65be80f0-7587-49b5-befa-318d386038b3" />
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Resolved Cases
+(it manages resolved cases)
 
-### `npm run build` fails to minify
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/1fadd08a-58b1-4a88-afbc-805e1544f75f" />
+<img width="1914" height="1079" alt="image" src="https://github.com/user-attachments/assets/d931eb68-b5d3-400d-aca6-3ccf3955cbd9" />
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
