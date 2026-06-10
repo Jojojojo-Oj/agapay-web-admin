@@ -1,4 +1,4 @@
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/54a13722-f085-480b-9317-d2141616063a" /># 🌐 AGAPAY Web
+# 🌐 AGAPAY Web
 
 A web-based emergency response system built to complement the AGAPAY mobile app. It allows users and responders to monitor emergency reports, view real-time locations, and access essential disaster preparedness resources through a browser.
 
