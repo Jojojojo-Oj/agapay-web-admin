@@ -135,26 +135,24 @@ function handleLogin(e){
 
     const btn = document.getElementById('loginBtn');
     const user = document.getElementById('username').value.trim();
-    const pass = document.getElementById('password').value.trim();
+    const pass = document.getElementById('password').value;
 
     btn.innerText = "Checking...";
     btn.disabled = true;
 
-    setTimeout(()=>{
-
+    setTimeout(() => {
         const correctUser = "admin";
-        const correctPass = "1234";
+        const correctPass = "09183284092";
 
-        if(user === correctUser && pass === correctPass){
-          sessionStorage.setItem("agapay_admin_logged_in", "true");
-          window.location.replace("/dashboard");
+        if (user === correctUser && pass === correctPass) {
+            sessionStorage.setItem("agapay_admin_logged_in", "true");
+            window.location.replace("/dashboard");
         } else {
             alert("❌ Invalid username or password");
             btn.innerText = "Login";
             btn.disabled = false;
         }
-
-    }, 1200);
+    }, 500);
 }
 </script>
 
