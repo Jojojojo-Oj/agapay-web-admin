@@ -19,6 +19,7 @@ import GlobalIncidentNotifications from "./components/GlobalIncidentNotification
 
 function App() {
   const [page, setPage] = useState("dashboard");
+  const [authChecked, setAuthChecked] = useState(false);
 
   // ✅ IMPORTANT FIX: Landing page first
   useEffect(() => {
@@ -40,6 +41,8 @@ function App() {
     if (path === "/dashboard") {
       setPage("dashboard");
     }
+
+    setAuthChecked(true);
   }, []);
 
   useEffect(() => {
@@ -62,6 +65,10 @@ function App() {
       window.removeEventListener("popstate", handleBack);
     };
   }, []);
+
+  if (!authChecked) {
+    return null;
+  }
 
   return (
   <>
